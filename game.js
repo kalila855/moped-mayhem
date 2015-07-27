@@ -14,3 +14,11 @@ function Tile (w,h,m,xPos,yPos,img,dir) {
 	this.direction = dir;
 } 
 
+//Constructor for Movable Class
+function Movable (w,h,m,xPos,yPos,img,xDir) {
+	Entity.call(this,w,h,m,xPos,yPos,img)
+	this.xMove = xDir;
+} 
+
+var myEntity = new Tile(1,1,false,10,10,"image.png",-1);
+console.log(myEntity.height);
