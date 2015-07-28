@@ -39,30 +39,31 @@ function Moped (x,y,dir) {
 	Movable.call(this,1,1,false,x,y,"",dir);
 }
 
+// constructor for tileRow
 function tileRow (y) {
-	var tiles = [];
-	var objects = [];
-	var rowType = Math.round(Math.random * 3);
+	this.tiles = [];
+	this.objects = [];
+	var rowType = Math.round(Math.random(3));
+	console.log(rowType);
 	if (rowType === 0) {
 		for (var i = 0; i < GRID_WIDTH; i++) {
-			tiles[i] = new Ground(i,y);
+			this.tiles[i] = new Ground(i,y);
 		}
 	}
 	else {
 		var dir = Math.round(Math.random(2));
-			if (dir === 0) {
-				dir -= 1;
+		if (dir === 0) {
+			dir -= 1;
 		}
 		for (var i = 0; i < GRID_WIDTH; i++) {
-			tiles[i] = new Road(i,y);
+			this.tiles[i] = new Road(i,y);
 		}
 		var numOfMopeds = Math.round(Math.random(2)) + 3;
 		var curX = 0;
-		for (int i = 0; i < numOfMopeds; i++) {
-			objects.push(new Moped(curX,y,dir));
-			curX += Math.round(Math.random(2)) + 1;
+		for (var i = 0; i < numOfMopeds; i++) {
+			this.objects.push(new Moped(curX,y,dir));
+			curX += Math.round(Math.random(3)) + 2;
+			console.log(curX);
 		}	
 	}
 }
-var myEntity = new Moped(1,1,-3)
-console.log(myEntity.height);
