@@ -49,8 +49,17 @@ function Boat (x,y,dir) {
 }
 
 //Medical Kit constructor
-function medicalKit(x,y) {
-	Movable.call(this,1,1,true,x,y,"",dir);
+function MedicalKit(x,y) {
+	Movable.call(this,1,1,true,x,y,"",0);
+}
+
+//Building constructor
+function Building(x,y) {
+	Movable.call(this,1,1,false,x,y,"",0);
+}
+
+function Tree(x,y) {
+	Movable.call(this,1,1,false,x,y,"",0);
 }
 
 // constructor for tileRow
@@ -65,8 +74,24 @@ function tileRow (y) {
 		}
 		var numOfObjects =  Math.round(Math.random()*2) + 3;
 		var curX = 0;
+		console.log(numOfObjects);
 		for (var i = 0; i < numOfObjects; i++) {
-			this.objects.push(new medicalKit(curX,y));
+			var objType = Math.round(Math.random()*3);
+			console.log(objType);
+			var object;
+			if (objType === 0) {
+				object = new MedicalKit(curX,y);
+				console.log("Adding Medical Kit");
+			}
+			else if (objType === 1) {
+				object = new Building(curX,y);
+				console.log("adding Building");
+			}
+			else  {
+				object = new Tree(curX,y);
+				console.log("adding tree");
+			}
+			this.objects.push(object);
 			curX += Math.round(Math.random()*3) + 1;
 		}
 		console.log("creating Ground");
