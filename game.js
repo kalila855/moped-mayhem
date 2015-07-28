@@ -2,6 +2,8 @@
 var GRID_WIDTH = 10;
 var GRID_HEIGHT = 11;
 
+
+
 //Constructor for Entitiy Class
 function Entity (w,h,m,xPos,yPos,img) {
 	this.width = w;
@@ -10,6 +12,11 @@ function Entity (w,h,m,xPos,yPos,img) {
 	this.x = xPos;
 	this.y = yPos;
 	this.imageSource = img;
+}
+
+function Character (xPos, yPos, img){
+	this.x = xPos;
+	this.y = yPos;
 }
 
 //Constructor for Tile Class
@@ -152,3 +159,31 @@ function init() {
         stage.addChild(circle);
         stage.update();
   }
+
+
+
+
+function printKey(e){
+	console.log(e.keyCode);
+
+
+
+	if(e.keyCode === 37){
+	  console.log("left");
+	  x-=1;
+
+	}
+
+	if(e.keyCode === 38){
+	  console.log("up");
+	}
+
+	if(e.keyCode === 39){
+	  console.log("right");
+	}
+
+	if(e.keyCode === 40){
+	  console.log("down");
+	}
+
+}	
