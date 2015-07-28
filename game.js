@@ -30,7 +30,7 @@ function Road (x,y) {
 
 //River constructor
 function River (x,y) {
-	Tile.call(this,1,1,true,x,y,"");
+	Tile.call(this,1,1,false,x,y,"");
 }
 
 //Ground Tile constructor
@@ -43,8 +43,14 @@ function Moped (x,y,dir) {
 	Movable.call(this,1,1,false,x,y,"",dir);
 }
 
+//Boat constructor
 function Boat (x,y,dir) {
-	Movable.call(this,1,1,false,x,y,"",dir);	
+	Movable.call(this,1,1,true,x,y,"",dir);	
+}
+
+//Medical Kit constructor
+function medicalKit(x,y) {
+	Movable.call(this,1,1,true,x,y,"",dir);
 }
 
 // constructor for tileRow
@@ -56,6 +62,12 @@ function tileRow (y) {
 	if (rowType === 0) {
 		for (var i = 0; i < GRID_WIDTH; i++) {
 			this.tiles[i] = new Ground(i,y);
+		}
+		var numOfObjects =  Math.round(Math.random()*2) + 3;
+		var curX = 0;
+		for (var i = 0; i < numOfObjects; i++) {
+			this.objects.push(new medicalKit(curX,y));
+			curX += Math.round(Math.random()*3) + 1;
 		}
 		console.log("creating Ground");
 	}
@@ -71,7 +83,7 @@ function tileRow (y) {
 		var curX = 0;
 		for (var i = 0; i < numOfMopeds; i++) {
 			this.objects.push(new Moped(curX,y,dir));
-			curX += Math.round(Math.random(3)) + 2;
+			curX += Math.round(Math.random()*3) + 2;
 		}	
 		console.log("creating road");
 	}
@@ -101,7 +113,7 @@ function Grid () {
 	}
 }
 
-
+// creates the grid
 var grid = new Grid();
 console.log(grid);
 
