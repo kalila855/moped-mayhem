@@ -34,11 +34,12 @@
 
 
 	<link rel="stylesheet" type="text/css" href="StyleWebPage.css">
+	<script src="https://code.createjs.com/easeljs-0.8.1.min.js"></script>
 	<script src="game.js" type="text/javascript"></script>
 
 </head>
 
-<body>
+<body onload="init();">
 
 
 	<div id="header">
@@ -48,6 +49,11 @@
 
 
 	<center><h2>Game</h2></center>
+
+  	
+  	<canvas id="demoCanvas" width="500" height="300"></canvas>
+	
+
 
 
 	<div id="section"><!-- 
