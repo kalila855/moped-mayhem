@@ -44,7 +44,6 @@ function tileRow (y) {
 	this.tiles = [];
 	this.objects = [];
 	var rowType = Math.round(Math.random(3));
-	console.log(rowType);
 	if (rowType === 0) {
 		for (var i = 0; i < GRID_WIDTH; i++) {
 			this.tiles[i] = new Ground(i,y);
@@ -63,7 +62,17 @@ function tileRow (y) {
 		for (var i = 0; i < numOfMopeds; i++) {
 			this.objects.push(new Moped(curX,y,dir));
 			curX += Math.round(Math.random(3)) + 2;
-			console.log(curX);
 		}	
 	}
 }
+
+//constructor for the grid
+function Grid () {
+	this.rows = [];
+	for (var i = 0; i < GRID_HEIGHT; i++) {
+		this.rows.push(new tileRow(i));
+	}
+}
+
+var grid = new Grid();
+console.log(grid);
