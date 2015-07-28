@@ -66,6 +66,7 @@ function Tree(x,y) {
 function tileRow (y) {
 	this.tiles = [];
 	this.objects = [];
+	this.y = y;
 	var rowType = Math.round(Math.random()*5);
 	console.log(rowType);
 	if (rowType === 0) {
@@ -130,6 +131,11 @@ function tileRow (y) {
 	}
 }
 
+//increases the y of a tileRow by one
+tileRow.prototype.shiftDown = function() {
+	this.y++;	
+};
+
 //constructor for the grid
 function Grid () {
 	this.rows = [];
@@ -138,8 +144,19 @@ function Grid () {
 	}
 }
 
+//shifts the grid down by one
+Grid.prototype.shiftDown = function() {
+	this.rows.pop();
+	for (var i = 0; i < this.rows.length; i++) {
+		this.rows[i].shiftDown();
+	}
+	this.rows.unshift(new tileRow(0));
+};
 // creates the grid
 var grid = new Grid();
+console.log(grid);
+
+grid.shiftDown();
 console.log(grid);
 
 function init() {
@@ -151,4 +168,4 @@ function init() {
         circle.y = 100;
         stage.addChild(circle);
         stage.update();
-  }
+};
