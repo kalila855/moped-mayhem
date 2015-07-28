@@ -26,7 +26,11 @@ function Movable (w,h,m,xPos,yPos,img,xDir) {
 //Road Tile constructor
 function Road (x,y) {
 	Tile.call(this,1,1,true,x,y,"");
-	var mopeds = [];
+}
+
+//River constructor
+function River (x,y) {
+	Tile.call(this,1,1,true,x,y,"");
 }
 
 //Ground Tile constructor
@@ -39,17 +43,23 @@ function Moped (x,y,dir) {
 	Movable.call(this,1,1,false,x,y,"",dir);
 }
 
+function Boat (x,y,dir) {
+	Movable.call(this,1,1,false,x,y,"",dir);	
+}
+
 // constructor for tileRow
 function tileRow (y) {
 	this.tiles = [];
 	this.objects = [];
-	var rowType = Math.round(Math.random(3));
+	var rowType = Math.round(Math.random()*5);
+	console.log(rowType);
 	if (rowType === 0) {
 		for (var i = 0; i < GRID_WIDTH; i++) {
 			this.tiles[i] = new Ground(i,y);
 		}
+		console.log("creating Ground");
 	}
-	else {
+	else if (rowType < 3) {
 		var dir = Math.round(Math.random(2));
 		if (dir === 0) {
 			dir -= 1;
@@ -57,12 +67,29 @@ function tileRow (y) {
 		for (var i = 0; i < GRID_WIDTH; i++) {
 			this.tiles[i] = new Road(i,y);
 		}
-		var numOfMopeds = Math.round(Math.random(2)) + 3;
+		var numOfMopeds = Math.round(Math.random()*2) + 3;
 		var curX = 0;
 		for (var i = 0; i < numOfMopeds; i++) {
 			this.objects.push(new Moped(curX,y,dir));
 			curX += Math.round(Math.random(3)) + 2;
 		}	
+		console.log("creating road");
+	}
+	else {
+		var dir = Math.round(Math.random()*2);
+		if (dir === 0) {
+			dir -= 1;
+		}
+		for (var i = 0; i < GRID_WIDTH; i++) {
+			this.tiles[i] = new River(i,y);
+		}
+		var numOfBoats = Math.round(Math.random()*2) + 3;
+		var curX = 0;
+		for (var i = 0; i < numOfBoats; i++) {
+			this.objects.push(new Boat(curX,y,dir));
+			curX += Math.round(Math.random()*3) + 2;
+		}	
+		console.log("creating river");
 	}
 }
 
