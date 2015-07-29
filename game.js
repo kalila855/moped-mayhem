@@ -81,28 +81,23 @@ function tileRow (y) {
 	this.objects = [];
 	this.y = y;
 	var rowType = Math.round(Math.random()*5);
-	console.log(rowType);
 	if (rowType === 0) {
 		for (var i = 0; i < GRID_WIDTH; i++) {
 			this.tiles[i] = new Ground(i,y);
 		}
 		var numOfObjects =  Math.round(Math.random()*2) + 3;
 		var curX = 0;
-		console.log(numOfObjects);
 		for (var i = 0; i < numOfObjects; i++) {
 			var objType = Math.round(Math.random()*3);
 			var object;
 			if (objType === 0) {
 				object = new MedicalKit(curX,y);
-				console.log("Adding Medical Kit");
 			}
 			else if (objType === 1) {
 				object = new Building(curX,y);
-				console.log("adding Building");
 			}
 			else  {
 				object = new Tree(curX,y);
-				console.log("adding tree");
 			}
 			this.objects.push(object);
 			this.tiles[curX].occupyingObject = object;
@@ -176,22 +171,18 @@ Grid.prototype.shiftDown = function() {
 	for (var i = 0; i < this.rows.length; i++) {
 		var curRow = this.rows[i];
 		curRow.shiftDown();
-		console.log(curRow);
 		for (var j = 0; j < this.rows[i].tiles.length; j++) {
 			curRow.tiles[j].y++;
-			console.log(curRow.tiles[j]);
 		}
 	}
 	this.rows.unshift(new tileRow(0));
 };
 // creates the grid
 var grid = new Grid();
-console.log(grid);
 runGame();
 
 function tileAvailable (x,y) {
 	var tile = grid.rows[y].tiles[x];
-	console.log(tile);
 	if (tile.canMoveOnto == false && tile.occupyingObject == false) {
 		console.log("the tile can't be moved onto and there is nothing occupying it");
 		return false;
@@ -236,9 +227,6 @@ function drawTiles() {
 
 
 
-
-grid.shiftDown();
-console.log(grid);
 var gameOver = false;
 
 function init() {
