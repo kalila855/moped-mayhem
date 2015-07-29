@@ -176,6 +176,8 @@ function init() {
         circle.y = 100;
         stage.addChild(circle);
         stage.update();
+  }
+
 
 }
 var character = new Character(5,10,"");
@@ -209,3 +211,4 @@ function printKey(e){
 
 }	
 
+};
