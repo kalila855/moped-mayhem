@@ -91,7 +91,6 @@ function tileRow (y) {
 		console.log(numOfObjects);
 		for (var i = 0; i < numOfObjects; i++) {
 			var objType = Math.round(Math.random()*3);
-			console.log(objType);
 			var object;
 			if (objType === 0) {
 				object = new MedicalKit(curX,y);
@@ -148,8 +147,6 @@ function tileRow (y) {
 		for (var i = 0; i < numOfBoats; i++) {
 			var boat = new Boat(curX,y,dir);
 			this.objects.push(boat);
-			console.log("CURRENT X");
-			console.log(curX);
 			this.tiles[curX].occupyingObject = boat;
 			curX += Math.round(Math.random()*3) + 2;
 			if (curX >= GRID_WIDTH - 1) {
@@ -242,7 +239,7 @@ function drawTiles() {
 
 grid.shiftDown();
 console.log(grid);
-
+var gameOver = false;
 
 function init() {
     
@@ -254,29 +251,48 @@ var character = new Character(5,10,"");
 function printKey(e){
 	console.log(e.keyCode);
 
-
+	if (gameOver == false) {
 
 	if(e.keyCode === 37){
-	  console.log("left");
-	  character.x-=1;
+		console.log("left");
+		if (character.x > 0 && tileAvailable(character.x-1,character.y)) {
+	  		character.x-=1;
+		}
+		else {
+			console.log("game over");
+			gameOver = true;
+		}
 
 	}
 
 	if(e.keyCode === 38){
 	  console.log("up");
-	  character.y-=1;
+	  if (tileAvailable(character.x,character.y-1)) {
+	  	grid.shiftDown();			
+	  }
+	  else {
+	  	console.log("game over");
+	  	gameOver = true;
+	  }
+	  
 	}
 
 	if(e.keyCode === 39){
-	  console.log("right");
-	  character.x+=1;
+		console.log("right");
+		if (character.x < GRID_WIDTH - 1 && tileAvailable(character.x+1,character.y)) {
+	  		character.x+=1;
+		}
+		else {
+			console.log("game over");
+			gameOver = true;
+		}
 	}
 
 	// if(e.keyCode === 40){
 	//   console.log("down");
 	//   character.y+=1;
 	// }
-
+	}
 }	
 
 
