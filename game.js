@@ -163,10 +163,19 @@ Grid.prototype.shiftDown = function() {
 // creates the grid
 var grid = new Grid();
 console.log(grid);
+runGame();
 
+function runGame() {
+	$(document).ready(function(){
+		console.log("ready");
+		drawTiles();
+   
 
-function draw() {
+	});
+}
 
+function drawTiles() {
+	console.log("draw tiles");
 
 }
 
@@ -185,7 +194,7 @@ function init() {
 	
 
 
-}
+
 var character = new Character(5,10,"");
 
 
@@ -217,5 +226,5 @@ function printKey(e){
 
 }	
 
-};
+
 
