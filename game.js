@@ -23,6 +23,7 @@ function Character (xPos, yPos, img){
 //Constructor for Tile Class
 function Tile (w,h,m,xPos,yPos,img) {
 	Entity.call(this,w,h,m,xPos,yPos,img);
+	this.occupyingObject = null;
 } 
 
 //Constructor for Movable Class
@@ -101,7 +102,11 @@ function tileRow (y) {
 				console.log("adding tree");
 			}
 			this.objects.push(object);
+			this.tiles[curX].occupyingObject = object;
 			curX += Math.round(Math.random()*3) + 1;
+			if (curX >= GRID_WIDTH) {
+				break;
+			}
 		}
 		console.log("creating Ground");
 	}
@@ -116,8 +121,13 @@ function tileRow (y) {
 		var numOfMopeds = Math.round(Math.random()*2) + 3;
 		var curX = 0;
 		for (var i = 0; i < numOfMopeds; i++) {
-			this.objects.push(new Moped(curX,y,dir));
+			var moped = new Moped(curX,y,dir);
+			this.objects.push(moped);
+			this.tiles[curX].occupyingObject = moped;
 			curX += Math.round(Math.random()*3) + 2;
+			if (curX >= GRID_WIDTH - 1) {
+				break;
+			}
 		}	
 		console.log("creating road");
 	}
@@ -132,8 +142,15 @@ function tileRow (y) {
 		var numOfBoats = Math.round(Math.random()*2) + 3;
 		var curX = 0;
 		for (var i = 0; i < numOfBoats; i++) {
-			this.objects.push(new Boat(curX,y,dir));
+			var boat = new Boat(curX,y,dir);
+			this.objects.push(boat);
+			console.log("CURRENT X");
+			console.log(curX);
+			this.tiles[curX].occupyingObject = boat;
 			curX += Math.round(Math.random()*3) + 2;
+			if (curX >= GRID_WIDTH - 1) {
+				break;
+			}
 		}	
 		console.log("creating river");
 	}
@@ -164,6 +181,21 @@ Grid.prototype.shiftDown = function() {
 var grid = new Grid();
 console.log(grid);
 
+function tileAvailable (x,y) {
+	var tile = grid.rows[y].tiles[x];
+	if (tile.canMoveOnto == false && tile.occupyingObject == false) {
+		return false;
+	}
+	else if (tile.occupyingObject == false && tile.canMoveOnto == true) {
+		return true;
+	}
+	else if (tile.occupyingObject.canMoveOnto == true) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
 
 function draw() {
 
@@ -185,7 +217,6 @@ function init() {
 	
 
 
-}
 var character = new Character(5,10,"");
 
 
@@ -217,5 +248,5 @@ function printKey(e){
 
 }	
 
-};
+
 
