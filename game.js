@@ -189,7 +189,6 @@ function printKey(e){
 	if(e.keyCode === 37){
 	  console.log("left");
 	  character.x-=1;
-	
 
 	}
 
