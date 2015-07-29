@@ -2,6 +2,8 @@
 var GRID_WIDTH = 10;
 var GRID_HEIGHT = 11;
 
+
+
 //Constructor for Entitiy Class
 function Entity (w,h,m,xPos,yPos,img) {
 	this.width = w;
@@ -10,6 +12,12 @@ function Entity (w,h,m,xPos,yPos,img) {
 	this.x = xPos;
 	this.y = yPos;
 	this.imageSource = img;
+}
+
+function Character (xPos, yPos, img){
+	this.x = xPos;
+	this.y = yPos;
+	this.img = img;
 }
 
 //Constructor for Tile Class
@@ -66,6 +74,7 @@ function Tree(x,y) {
 function tileRow (y) {
 	this.tiles = [];
 	this.objects = [];
+	this.y = y;
 	var rowType = Math.round(Math.random()*5);
 	console.log(rowType);
 	if (rowType === 0) {
@@ -130,6 +139,11 @@ function tileRow (y) {
 	}
 }
 
+//increases the y of a tileRow by one
+tileRow.prototype.shiftDown = function() {
+	this.y++;	
+};
+
 //constructor for the grid
 function Grid () {
 	this.rows = [];
@@ -138,10 +152,19 @@ function Grid () {
 	}
 }
 
+//shifts the grid down by one
+Grid.prototype.shiftDown = function() {
+	this.rows.pop();
+	for (var i = 0; i < this.rows.length; i++) {
+		this.rows[i].shiftDown();
+	}
+	this.rows.unshift(new tileRow(0));
+};
 // creates the grid
 var grid = new Grid();
 console.log(grid);
 
+<<<<<<< HEAD
 function draw() {
 
 
@@ -150,9 +173,51 @@ function draw() {
 
 
 
+=======
+grid.shiftDown();
+console.log(grid);
+>>>>>>> e411957888713353bcda9e67bc094e8a250a2023
 
 function init() {
     
   }
+<<<<<<< HEAD
 	
 	
+=======
+
+
+}
+var character = new Character(5,10,"");
+
+
+function printKey(e){
+	console.log(e.keyCode);
+
+
+
+	if(e.keyCode === 37){
+	  console.log("left");
+	  character.x-=1;
+
+	}
+
+	if(e.keyCode === 38){
+	  console.log("up");
+	  character.y-=1;
+	}
+
+	if(e.keyCode === 39){
+	  console.log("right");
+	  character.x+=1;
+	}
+
+	// if(e.keyCode === 40){
+	//   console.log("down");
+	//   character.y+=1;
+	// }
+
+}	
+
+};
+>>>>>>> e411957888713353bcda9e67bc094e8a250a2023
