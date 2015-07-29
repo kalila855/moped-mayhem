@@ -180,14 +180,12 @@ Grid.prototype.shiftDown = function() {
 };
 // creates the grid
 var grid = new Grid();
-<<<<<<< HEAD
-console.log(grid);
 
 
-var stage;
-runGame();
-=======
-runGame();
+
+
+
+
 
 function tileAvailable (x,y) {
 	var tile = grid.rows[y].tiles[x];
@@ -218,8 +216,9 @@ function tileAvailable (x,y) {
 		return false;
 	}
 }
+var stage;
+runGame();
 
->>>>>>> a895da38ceb37b368c83ec6db6718f9638e19f34
 function runGame() {
 	$(document).ready(function(){
 		console.log("ready");
@@ -268,14 +267,13 @@ function drawTiles() {
 
 
 
-<<<<<<< HEAD
 
 //grid.shiftDown();
 console.log(grid);
 
-=======
+
 var gameOver = false;
->>>>>>> a895da38ceb37b368c83ec6db6718f9638e19f34
+
 
 function init() {
     
