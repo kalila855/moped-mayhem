@@ -26,6 +26,10 @@ function Tile (w,h,m,xPos,yPos,img) {
 	this.occupyingObject = null;
 } 
 
+Tile.prototype.shiftDown = function() {
+	this.y += 1;
+};
+
 //Constructor for Movable Class
 function Movable (w,h,m,xPos,yPos,img,xDir) {
 	Entity.call(this,w,h,m,xPos,yPos,img);
@@ -173,7 +177,13 @@ function Grid () {
 Grid.prototype.shiftDown = function() {
 	this.rows.pop();
 	for (var i = 0; i < this.rows.length; i++) {
-		this.rows[i].shiftDown();
+		var curRow = this.rows[i];
+		curRow.shiftDown();
+		console.log(curRow);
+		for (var j = 0; j < this.rows[i].tiles.length; j++) {
+			curRow.tiles[j].y++;
+			console.log(curRow.tiles[j]);
+		}
 	}
 	this.rows.unshift(new tileRow(0));
 };
@@ -183,16 +193,27 @@ console.log(grid);
 
 function tileAvailable (x,y) {
 	var tile = grid.rows[y].tiles[x];
+	console.log(tile);
 	if (tile.canMoveOnto == false && tile.occupyingObject == false) {
+		console.log("the tile can't be moved onto and there is nothing occupying it");
 		return false;
 	}
 	else if (tile.occupyingObject == false && tile.canMoveOnto == true) {
+		console.log("the tile can be moved onto and there isn't something occupying it");
 		return true;
 	}
-	else if (tile.occupyingObject.canMoveOnto == true) {
-		return true;
+	else if (tile.occupyingObject) {
+		if (tile.occupyingObject.canMoveOnto == true) {
+			console.log("the tile has an object occupying it that can be moved onto");
+			return true;
+		}	
+		else {
+			console.log("the tile has an object occupying it that can't be moved onto");
+			return false;
+		}
 	}
 	else {
+		console.log("default false");
 		return false;
 	}
 }
@@ -211,7 +232,7 @@ console.log(grid);
 
 function init() {
     
-  }
+}
 
 	
 	
