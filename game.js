@@ -163,23 +163,38 @@ Grid.prototype.shiftDown = function() {
 // creates the grid
 var grid = new Grid();
 console.log(grid);
+runGame();
+
+function runGame() {
+	$(document).ready(function(){
+		console.log("ready");
+		drawTiles();
+   
+
+	});
+}
+
+function drawTiles() {
+	console.log("draw tiles");
+
+}
+
+
+
 
 grid.shiftDown();
 console.log(grid);
 
+
 function init() {
-    // code here.
-   		var stage = new createjs.Stage("demoCanvas");
-        var circle = new createjs.Shape();
-        circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 50);
-        circle.x = 200;
-        circle.y = 100;
-        stage.addChild(circle);
-        stage.update();
+    
   }
 
+	
+	
 
-}
+
+
 var character = new Character(5,10,"");
 
 
@@ -211,4 +226,5 @@ function printKey(e){
 
 }	
 
-};
+
+
