@@ -1,6 +1,7 @@
 
 var GRID_WIDTH = 10;
 var GRID_HEIGHT = 11;
+var TILE_WIDTH = 50; //Tiles are 50x50 pixels
 
 
 
@@ -33,17 +34,17 @@ function Movable (w,h,m,xPos,yPos,img,xDir) {
 
 //Road Tile constructor
 function Road (x,y) {
-	Tile.call(this,1,1,true,x,y,"");
+	Tile.call(this,1,1,true,x,y,"testImages/road.jpg");
 }
 
 //River constructor
 function River (x,y) {
-	Tile.call(this,1,1,false,x,y,"");
+	Tile.call(this,1,1,false,x,y,"testImages/temp-tile.png");
 }
 
 //Ground Tile constructor
 function Ground (x,y) {
-	Tile.call(this,1,1,true,x,y,"");
+	Tile.call(this,1,1,true,x,y,"testImages/temp-tile.png");
 }
 
 //Moped constructor
@@ -163,11 +164,14 @@ Grid.prototype.shiftDown = function() {
 // creates the grid
 var grid = new Grid();
 console.log(grid);
-runGame();
 
+
+var stage;
+runGame();
 function runGame() {
 	$(document).ready(function(){
 		console.log("ready");
+		stage = new createjs.Stage("demoCanvas");
 		drawTiles();
    
 
@@ -176,13 +180,44 @@ function runGame() {
 
 function drawTiles() {
 	console.log("draw tiles");
+	for(var row = 0; row < grid.rows.length; row++) {
+		var tileRow = grid.rows[row];
+		var arrayOfTiles = tileRow.tiles;
+		
+		for(var col = 0; col < arrayOfTiles.length; col++) {
+			var tile = arrayOfTiles[col];
+			//console.log("tiles");
+			
+			var image = new Image();
+    		image.src = tile.imageSource;
+    	//	image.src = "testImages/road.jpg";
+
+    		//console.log(tile.x + " : " + tile.y);
+    		
+	    		var bitmap = new createjs.Bitmap(image);
+	       		console.log("image loaded");
+	         	
+	         	stage.addChild(bitmap);
+	         	bitmap.x = tile.x * TILE_WIDTH;
+	         	bitmap.y = tile.y * TILE_WIDTH;  
+
+	         	console.log(bitmap.x + " : " + bitmap.y);  
+	         	
+	         $(image).load(function(){
+				stage.update();
+         	 });	
+   			
+
+    		
+		}
+	}
 
 }
 
 
 
 
-grid.shiftDown();
+//grid.shiftDown();
 console.log(grid);
 
 
