@@ -175,7 +175,6 @@ function init() {
         circle.y = 100;
         stage.addChild(circle);
         stage.update();
-<<<<<<< HEAD
   }
 
 
@@ -205,6 +204,5 @@ function printKey(e){
 	}
 
 }	
-=======
+
 };
->>>>>>> 979dc7f6ea602290a4259c3357c517720fb7e8b0
