@@ -176,11 +176,8 @@ function init() {
         circle.y = 100;
         stage.addChild(circle);
         stage.update();
-<<<<<<< HEAD
   }
 
-=======
->>>>>>> 6f781ba3e9f3a911f465fdc5cf53ac14373deed8
 
 }
 var character = new Character(5,10,"");
@@ -215,7 +212,4 @@ function printKey(e){
 
 }	
 
-<<<<<<< HEAD
 };
-=======
->>>>>>> 6f781ba3e9f3a911f465fdc5cf53ac14373deed8
