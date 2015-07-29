@@ -23,7 +23,12 @@ function Character (xPos, yPos, img){
 //Constructor for Tile Class
 function Tile (w,h,m,xPos,yPos,img) {
 	Entity.call(this,w,h,m,xPos,yPos,img);
+	this.occupyingObject = null;
 } 
+
+Tile.prototype.shiftDown = function() {
+	this.y += 1;
+};
 
 //Constructor for Movable Class
 function Movable (w,h,m,xPos,yPos,img,xDir) {
@@ -101,7 +106,11 @@ function tileRow (y) {
 				console.log("adding tree");
 			}
 			this.objects.push(object);
+			this.tiles[curX].occupyingObject = object;
 			curX += Math.round(Math.random()*3) + 1;
+			if (curX >= GRID_WIDTH) {
+				break;
+			}
 		}
 		console.log("creating Ground");
 	}
@@ -116,8 +125,13 @@ function tileRow (y) {
 		var numOfMopeds = Math.round(Math.random()*2) + 3;
 		var curX = 0;
 		for (var i = 0; i < numOfMopeds; i++) {
-			this.objects.push(new Moped(curX,y,dir));
+			var moped = new Moped(curX,y,dir);
+			this.objects.push(moped);
+			this.tiles[curX].occupyingObject = moped;
 			curX += Math.round(Math.random()*3) + 2;
+			if (curX >= GRID_WIDTH - 1) {
+				break;
+			}
 		}	
 		console.log("creating road");
 	}
@@ -132,8 +146,15 @@ function tileRow (y) {
 		var numOfBoats = Math.round(Math.random()*2) + 3;
 		var curX = 0;
 		for (var i = 0; i < numOfBoats; i++) {
-			this.objects.push(new Boat(curX,y,dir));
+			var boat = new Boat(curX,y,dir);
+			this.objects.push(boat);
+			console.log("CURRENT X");
+			console.log(curX);
+			this.tiles[curX].occupyingObject = boat;
 			curX += Math.round(Math.random()*3) + 2;
+			if (curX >= GRID_WIDTH - 1) {
+				break;
+			}
 		}	
 		console.log("creating river");
 	}
@@ -156,7 +177,13 @@ function Grid () {
 Grid.prototype.shiftDown = function() {
 	this.rows.pop();
 	for (var i = 0; i < this.rows.length; i++) {
-		this.rows[i].shiftDown();
+		var curRow = this.rows[i];
+		curRow.shiftDown();
+		console.log(curRow);
+		for (var j = 0; j < this.rows[i].tiles.length; j++) {
+			curRow.tiles[j].y++;
+			console.log(curRow.tiles[j]);
+		}
 	}
 	this.rows.unshift(new tileRow(0));
 };
@@ -164,6 +191,37 @@ Grid.prototype.shiftDown = function() {
 var grid = new Grid();
 console.log(grid);
 runGame();
+
+function tileAvailable (x,y) {
+	var tile = grid.rows[y].tiles[x];
+	console.log(tile);
+	if (tile.canMoveOnto == false && tile.occupyingObject == false) {
+		console.log("the tile can't be moved onto and there is nothing occupying it");
+		return false;
+	}
+	else if (tile.occupyingObject == false && tile.canMoveOnto == true) {
+		console.log("the tile can be moved onto and there isn't something occupying it");
+		return true;
+	}
+	else if (tile.occupyingObject) {
+		if (tile.occupyingObject.canMoveOnto == true) {
+			console.log("the tile has an object occupying it that can be moved onto");
+			return true;
+		}	
+		else {
+			console.log("the tile has an object occupying it that can't be moved onto");
+			return false;
+		}
+	}
+	else if (tile.canMoveOnto) {
+		console.log("the tile can be moved onto");
+		return true;
+	}
+	else {
+		console.log("default false");
+		return false;
+	}
+}
 
 function runGame() {
 	$(document).ready(function(){
@@ -188,12 +246,7 @@ console.log(grid);
 
 function init() {
     
-  }
-
-	
-	
-
-
+}
 
 var character = new Character(5,10,"");
 
