@@ -24,7 +24,12 @@ function Character (xPos, yPos, img){
 //Constructor for Tile Class
 function Tile (w,h,m,xPos,yPos,img) {
 	Entity.call(this,w,h,m,xPos,yPos,img);
+	this.occupyingObject = null;
 } 
+
+Tile.prototype.shiftDown = function() {
+	this.y += 1;
+};
 
 //Constructor for Movable Class
 function Movable (w,h,m,xPos,yPos,img,xDir) {
@@ -77,32 +82,30 @@ function tileRow (y) {
 	this.objects = [];
 	this.y = y;
 	var rowType = Math.round(Math.random()*5);
-	console.log(rowType);
 	if (rowType === 0) {
 		for (var i = 0; i < GRID_WIDTH; i++) {
 			this.tiles[i] = new Ground(i,y);
 		}
 		var numOfObjects =  Math.round(Math.random()*2) + 3;
 		var curX = 0;
-		console.log(numOfObjects);
 		for (var i = 0; i < numOfObjects; i++) {
 			var objType = Math.round(Math.random()*3);
-			console.log(objType);
 			var object;
 			if (objType === 0) {
 				object = new MedicalKit(curX,y);
-				console.log("Adding Medical Kit");
 			}
 			else if (objType === 1) {
 				object = new Building(curX,y);
-				console.log("adding Building");
 			}
 			else  {
 				object = new Tree(curX,y);
-				console.log("adding tree");
 			}
 			this.objects.push(object);
+			this.tiles[curX].occupyingObject = object;
 			curX += Math.round(Math.random()*3) + 1;
+			if (curX >= GRID_WIDTH) {
+				break;
+			}
 		}
 		console.log("creating Ground");
 	}
@@ -117,8 +120,13 @@ function tileRow (y) {
 		var numOfMopeds = Math.round(Math.random()*2) + 3;
 		var curX = 0;
 		for (var i = 0; i < numOfMopeds; i++) {
-			this.objects.push(new Moped(curX,y,dir));
+			var moped = new Moped(curX,y,dir);
+			this.objects.push(moped);
+			this.tiles[curX].occupyingObject = moped;
 			curX += Math.round(Math.random()*3) + 2;
+			if (curX >= GRID_WIDTH - 1) {
+				break;
+			}
 		}	
 		console.log("creating road");
 	}
@@ -133,8 +141,13 @@ function tileRow (y) {
 		var numOfBoats = Math.round(Math.random()*2) + 3;
 		var curX = 0;
 		for (var i = 0; i < numOfBoats; i++) {
-			this.objects.push(new Boat(curX,y,dir));
+			var boat = new Boat(curX,y,dir);
+			this.objects.push(boat);
+			this.tiles[curX].occupyingObject = boat;
 			curX += Math.round(Math.random()*3) + 2;
+			if (curX >= GRID_WIDTH - 1) {
+				break;
+			}
 		}	
 		console.log("creating river");
 	}
@@ -157,17 +170,56 @@ function Grid () {
 Grid.prototype.shiftDown = function() {
 	this.rows.pop();
 	for (var i = 0; i < this.rows.length; i++) {
-		this.rows[i].shiftDown();
+		var curRow = this.rows[i];
+		curRow.shiftDown();
+		for (var j = 0; j < this.rows[i].tiles.length; j++) {
+			curRow.tiles[j].y++;
+		}
 	}
 	this.rows.unshift(new tileRow(0));
 };
 // creates the grid
 var grid = new Grid();
+<<<<<<< HEAD
 console.log(grid);
 
 
 var stage;
 runGame();
+=======
+runGame();
+
+function tileAvailable (x,y) {
+	var tile = grid.rows[y].tiles[x];
+	if (tile.canMoveOnto == false && tile.occupyingObject == false) {
+		console.log("the tile can't be moved onto and there is nothing occupying it");
+		return false;
+	}
+	else if (tile.occupyingObject == false && tile.canMoveOnto == true) {
+		console.log("the tile can be moved onto and there isn't something occupying it");
+		return true;
+	}
+	else if (tile.occupyingObject) {
+		if (tile.occupyingObject.canMoveOnto == true) {
+			console.log("the tile has an object occupying it that can be moved onto");
+			return true;
+		}	
+		else {
+			console.log("the tile has an object occupying it that can't be moved onto");
+			return false;
+		}
+	}
+	else if (tile.canMoveOnto) {
+		console.log("the tile can be moved onto");
+		return true;
+	}
+	else {
+		console.log("default false");
+		return false;
+	}
+}
+
+>>>>>>> a895da38ceb37b368c83ec6db6718f9638e19f34
 function runGame() {
 	$(document).ready(function(){
 		console.log("ready");
@@ -216,19 +268,18 @@ function drawTiles() {
 
 
 
+<<<<<<< HEAD
 
 //grid.shiftDown();
 console.log(grid);
 
+=======
+var gameOver = false;
+>>>>>>> a895da38ceb37b368c83ec6db6718f9638e19f34
 
 function init() {
     
-  }
-
-	
-	
-
-
+}
 
 var character = new Character(5,10,"");
 
@@ -236,29 +287,48 @@ var character = new Character(5,10,"");
 function printKey(e){
 	console.log(e.keyCode);
 
-
+	if (gameOver == false) {
 
 	if(e.keyCode === 37){
-	  console.log("left");
-	  character.x-=1;
+		console.log("left");
+		if (character.x > 0 && tileAvailable(character.x-1,character.y)) {
+	  		character.x-=1;
+		}
+		else {
+			console.log("game over");
+			gameOver = true;
+		}
 
 	}
 
 	if(e.keyCode === 38){
 	  console.log("up");
-	  character.y-=1;
+	  if (tileAvailable(character.x,character.y-1)) {
+	  	grid.shiftDown();			
+	  }
+	  else {
+	  	console.log("game over");
+	  	gameOver = true;
+	  }
+	  
 	}
 
 	if(e.keyCode === 39){
-	  console.log("right");
-	  character.x+=1;
+		console.log("right");
+		if (character.x < GRID_WIDTH - 1 && tileAvailable(character.x+1,character.y)) {
+	  		character.x+=1;
+		}
+		else {
+			console.log("game over");
+			gameOver = true;
+		}
 	}
 
 	// if(e.keyCode === 40){
 	//   console.log("down");
 	//   character.y+=1;
 	// }
-
+	}
 }	
 
 
