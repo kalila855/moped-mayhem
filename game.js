@@ -212,6 +212,10 @@ function tileAvailable (x,y) {
 			return false;
 		}
 	}
+	else if (tile.canMoveOnto) {
+		console.log("the tile can be moved onto");
+		return true;
+	}
 	else {
 		console.log("default false");
 		return false;
