@@ -164,7 +164,7 @@ Grid.prototype.shiftDown = function() {
 var grid = new Grid();
 console.log(grid);
 
-<<<<<<< HEAD
+
 function draw() {
 
 
@@ -173,18 +173,16 @@ function draw() {
 
 
 
-=======
 grid.shiftDown();
 console.log(grid);
->>>>>>> e411957888713353bcda9e67bc094e8a250a2023
+
 
 function init() {
     
   }
-<<<<<<< HEAD
+
 	
 	
-=======
 
 
 }
@@ -220,4 +218,4 @@ function printKey(e){
 }	
 
 };
->>>>>>> e411957888713353bcda9e67bc094e8a250a2023
+
