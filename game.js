@@ -142,13 +142,17 @@ function Grid () {
 var grid = new Grid();
 console.log(grid);
 
+function draw() {
+
+
+}
+
+
+
+
+
 function init() {
-    // code here.
-   		var stage = new createjs.Stage("demoCanvas");
-        var circle = new createjs.Shape();
-        circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 50);
-        circle.x = 200;
-        circle.y = 100;
-        stage.addChild(circle);
-        stage.update();
+    
   }
+	
+	
