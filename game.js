@@ -17,6 +17,7 @@ function Entity (w,h,m,xPos,yPos,img) {
 function Character (xPos, yPos, img){
 	this.x = xPos;
 	this.y = yPos;
+	this.img = img;
 }
 
 //Constructor for Tile Class
@@ -175,10 +176,9 @@ function init() {
         circle.y = 100;
         stage.addChild(circle);
         stage.update();
-<<<<<<< HEAD
-  }
 
-
+}
+var character = new Character(5,10,"");
 
 
 function printKey(e){
@@ -188,23 +188,25 @@ function printKey(e){
 
 	if(e.keyCode === 37){
 	  console.log("left");
-	  x-=1;
+	  character.x-=1;
+	
 
 	}
 
 	if(e.keyCode === 38){
 	  console.log("up");
+	  character.y-=1;
 	}
 
 	if(e.keyCode === 39){
 	  console.log("right");
+	  character.x+=1;
 	}
 
-	if(e.keyCode === 40){
-	  console.log("down");
-	}
+	// if(e.keyCode === 40){
+	//   console.log("down");
+	//   character.y+=1;
+	// }
 
 }	
-=======
-};
->>>>>>> 979dc7f6ea602290a4259c3357c517720fb7e8b0
+
