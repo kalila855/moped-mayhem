@@ -44,7 +44,7 @@ function Road (x,y) {
 
 //River constructor
 function River (x,y) {
-	Tile.call(this,1,1,false,x,y,"testImages/temp-tile.png");
+	Tile.call(this,1,1,false,x,y,"testImages/water.png");
 }
 
 //Ground Tile constructor
