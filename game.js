@@ -188,6 +188,9 @@ Grid.prototype.shiftDown = function() {
 		for (var j = 0; j < this.rows[i].tiles.length; j++) {
 			curRow.tiles[j].y++;
 		}
+		for (var j = 0; j < this.rows[i].objects.length; j++) {
+			curRow.objects[j].y++;
+		}
 	}
 	var rowType = Math.round(Math.random()*4);
 	if (rowType > 1) {
@@ -206,6 +209,7 @@ function tileAvailable (x,y) {
 	if (tile.canMoveOnto == false && tile.occupyingObject == false) {
 		console.log("the tile can't be moved onto and there is nothing occupying it");
 		gameOver = true;
+		console.log("game over");
 		return false;
 	}
 	else if (tile.occupyingObject == false && tile.canMoveOnto == true) {
@@ -228,6 +232,7 @@ function tileAvailable (x,y) {
 			console.log("the tile has an object occupying it that can't be moved onto");
 			if (tile.occupyingObject.willKill) {
 				gameOver = true;	
+				console.log("game over");
 			}
 			return false;
 		}
@@ -239,6 +244,7 @@ function tileAvailable (x,y) {
 	else {
 		console.log("default false");
 		gameOver = true;
+		console.log("game over");
 		return false;
 	}
 }
