@@ -19,6 +19,7 @@ function Character (xPos, yPos, img){
 	this.x = xPos;
 	this.y = yPos;
 	this.img = img;
+	this.points = 0;
 }
 
 //Constructor for Tile Class
@@ -210,7 +211,14 @@ function tileAvailable (x,y) {
 		return true;
 	}
 	else if (tile.occupyingObject) {
-		if (tile.occupyingObject.canMoveOnto == true) {
+		if (tile.occupyingObject instanceOf MedicalKit) {
+			console.log("you collected a MedicalKit");
+			var medicalIndex = grid.rows[y].objects.indexOf(tile.occupyingObject);
+			grid.rows[y].objects.splice(medicalIndex,1);
+			character.points++;
+			return true;
+		}
+		else if (tile.occupyingObject.canMoveOnto == true) {
 			console.log("the tile has an object occupying it that can be moved onto");
 			return true;
 		}	
@@ -294,6 +302,7 @@ function init() {
 var character = new Character(5,10,"");
 
 
+
 function printKey(e){
 	console.log(e.keyCode);
 
@@ -339,6 +348,7 @@ function printKey(e){
 	//   character.y+=1;
 	// }
 	}
+	drawTiles();
 }	
 
 
