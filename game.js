@@ -246,6 +246,7 @@ function tileAvailable (x,y) {
 			if (tile.occupyingObject.willKill) {
 				gameOver = true;	
 				console.log("game over");
+				return true;
 			}
 			return false;
 		}
