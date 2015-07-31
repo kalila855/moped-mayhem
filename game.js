@@ -39,9 +39,10 @@ Entity.prototype.shiftDown = function() {
 };
 
 //Constructor for Movable Class
-function Movable (w,h,m,xPos,yPos,img,xDir) {
+function Movable (w,h,m,xPos,yPos,img,xDir,kill) {
 	Entity.call(this,w,h,m,xPos,yPos,img);
 	this.xMove = xDir;
+	this.willKill = kill;
 } 
 
 Movable.prototype.move = function() {
@@ -65,26 +66,26 @@ function Ground (x,y) {
 
 //Moped constructor
 function Moped (x,y,dir) {
-	Movable.call(this,1,1,false,x,y,"testImages/mopeds.png",dir);
+	Movable.call(this,1,1,false,x,y,"testImages/mopeds.png",dir,true);
 }
 
 //Boat constructor
 function Boat (x,y,dir) {
-	Movable.call(this,1,1,true,x,y,"testImages/boat.png",dir);	
+	Movable.call(this,1,1,true,x,y,"testImages/boat.png",dir,false);	
 }
 
 //Medical Kit constructor
 function MedicalKit(x,y) {
-	Movable.call(this,1,1,true,x,y,"testImages/medical-kit.png",0);
+	Movable.call(this,1,1,true,x,y,"testImages/medical-kit.png",0,false);
 }
 
 //Building constructor
 function Building(x,y) {
-	Movable.call(this,1,1,false,x,y,"testImages/temp-tile",0);
+	Movable.call(this,1,1,false,x,y,"testImages/temple.png",0,false);
 }
 
 function Tree(x,y) {
-	Movable.call(this,1,1,false,x,y,"testImages/tree.png",0);
+	Movable.call(this,1,1,false,x,y,"testImages/tree.png",0,false);
 }
 
 // constructor for tileRow
@@ -190,6 +191,9 @@ Grid.prototype.shiftDown = function() {
 		for (var j = 0; j < this.rows[i].tiles.length; j++) {
 			curRow.tiles[j].y++;
 		}
+		for (var j = 0; j < this.rows[i].objects.length; j++) {
+			curRow.objects[j].y++;
+		}
 	}
 	var rowType = Math.round(Math.random()*4);
 	if (rowType > 1) {
@@ -209,6 +213,8 @@ function tileAvailable (x,y) {
 	var tile = grid.rows[y].tiles[x];
 	if (tile.canMoveOnto == false && tile.occupyingObject == false) {
 		console.log("the tile can't be moved onto and there is nothing occupying it");
+		gameOver = true;
+		console.log("game over");
 		return false;
 	}
 	else if (tile.occupyingObject == false && tile.canMoveOnto == true) {
@@ -229,6 +235,10 @@ function tileAvailable (x,y) {
 		}	
 		else {
 			console.log("the tile has an object occupying it that can't be moved onto");
+			if (tile.occupyingObject.willKill) {
+				gameOver = true;	
+				console.log("game over");
+			}
 			return false;
 		}
 	}
@@ -238,6 +248,8 @@ function tileAvailable (x,y) {
 	}
 	else {
 		console.log("default false");
+		gameOver = true;
+		console.log("game over");
 		return false;
 	}
 }
@@ -261,8 +273,10 @@ function loadImages() {
 	queue.on("complete", handleComplete, this);
 	queue.loadManifest(["testImages/water.png", "testImages/ground.jpg", "testImages/road.png",
 		"testImages/medical-kit.png", "testImages/boat.png", "testImages/tree.png", 
-		"testImages/temp-tile.png", "testImages/mopeds.png", "testImages/nurse-f.png", 
-		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png"]);//Works now, but it's hard coded
+		"testImages/mopeds.png", "testImages/nurse-f.png", 
+		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png",
+		"testImages/temple.png"]);//Works now, but it's hard coded
+
 	console.log("images loaded");
 	//preload.loadFile("assets/preloadjs-bg-center.png");
 }
@@ -332,6 +346,7 @@ function printKey(e){
 
 	if (gameOver == false) {
 
+
 		if(e.keyCode === 65){
 			console.log("left");
 			if (character.x > 0 && tileAvailable(character.x-1,character.y)) {
@@ -366,6 +381,7 @@ function printKey(e){
 				gameOver = true;
 			}
 		}
+	
 
 	// if(e.keyCode === 40){
 	//   console.log("down");
