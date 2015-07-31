@@ -110,7 +110,7 @@ function tileRow (y,rowType) {
 			}
 			this.objects.push(object);
 			this.tiles[curX].occupyingObject = object;
-			curX += Math.round(Math.random()*3) + 1;
+			curX += Math.round(Math.random()*3) + 2;
 			if (curX >= GRID_WIDTH) {
 				break;
 			}
