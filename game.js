@@ -126,7 +126,7 @@ function tileRow (y,rowType) {
 				break;
 			}
 		}
-		console.log("creating Ground");
+		//makes ground
 	}
 	else if (rowType === 1) {
 		var dir = Math.round(Math.random(2));
@@ -147,7 +147,7 @@ function tileRow (y,rowType) {
 				break;
 			}
 		}	
-		console.log("creating road");
+		//creates road^^
 	}
 	else {
 		var dir = Math.round(Math.random()*2);
@@ -168,7 +168,7 @@ function tileRow (y,rowType) {
 				break;
 			}
 		}	
-		console.log("creating river");
+		//create river
 	}
 }
 
@@ -286,7 +286,7 @@ function loadImages() {
 		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png",
 		"testImages/temple.png","testImages/house.png"]);//Works now, but it's hard coded
 
-	console.log("images loaded");
+	//images should be loaded
 	//preload.loadFile("assets/preloadjs-bg-center.png");
 }
 
@@ -341,7 +341,6 @@ function moveObjects() {
 		for(var col = 0; col < arrayOfObjects.length; col++) {
 			var object = arrayOfObjects[col];						
 			if(object.constructor == Moped || object.constructor == Boat) {
-				console.log("MOVINGOBJECT");
 				object.x += object.xMove;  
 			}	 		
 		}
@@ -350,7 +349,7 @@ function moveObjects() {
 }
 
 function drawObjects() {
-	console.log("draw objects");
+	
 	drawTiles();//Maybe this will work
 	for(var row = 0; row < grid.rows.length; row++) {
 		var tileRow = grid.rows[row];
@@ -391,13 +390,11 @@ var gameOver = false;
 
 
 function printKey(e){
-	console.log(e.keyCode);
 
 	if (gameOver == false) {
 
 
 		if(e.keyCode === 65){
-			console.log("left");
 			if (character.x > 0 && tileAvailable(character.x-1,character.y)) {
 		  		character.x-=1;
 			}
@@ -409,7 +406,6 @@ function printKey(e){
 		}
 
 		if(e.keyCode === 87){
-		  console.log("up");
 		  if (tileAvailable(character.x,character.y-1)) {
 		  	grid.shiftDown();			
 		  }
@@ -421,7 +417,6 @@ function printKey(e){
 		}
 
 		if(e.keyCode === 68){
-			console.log("right");
 			if (character.x < GRID_WIDTH - 1 && tileAvailable(character.x+1,character.y)) {
 		  		character.x+=1;
 			}
@@ -431,11 +426,6 @@ function printKey(e){
 			}
 		}
 	
-
-	// if(e.keyCode === 40){
-	//   console.log("down");
-	//   character.y+=1;
-	// }
 	}
 	if(gameOver) {
 		doGameOver();
