@@ -106,7 +106,7 @@ function tileRow (y,rowType) {
 			this.tiles[i] = new Ground(i,y);
 		}
 		var numOfObjects =  Math.round(Math.random()*2) + 3;
-		var curX = 0;
+		var curX = Math.round(Math.random()*3);
 		for (var i = 0; i < numOfObjects; i++) {
 			var objType = Math.round(Math.random()*3);
 			var object;
@@ -137,7 +137,7 @@ function tileRow (y,rowType) {
 			this.tiles[i] = new Road(i,y);
 		}
 		var numOfMopeds = Math.round(Math.random()*2) + 3;
-		var curX = 0;
+		var curX = Math.round(Math.random()*3);
 		for (var i = 0; i < numOfMopeds; i++) {
 			var moped = new Moped(curX,y,dir);
 			this.objects.push(moped);
@@ -158,7 +158,7 @@ function tileRow (y,rowType) {
 			this.tiles[i] = new River(i,y);
 		}
 		var numOfBoats = Math.round(Math.random()*2) + 3;
-		var curX = 0;
+		var curX = Math.round(Math.random()*3);
 		for (var i = 0; i < numOfBoats; i++) {
 			var boat = new Boat(curX,y,dir);
 			this.objects.push(boat);
