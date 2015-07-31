@@ -3,22 +3,22 @@
 <head>
 
 
-
 	<title> Moped Mayhem! </title>
 
 	<link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
 
 	<style>
 		#header {
-		    background-color:red;
+		    /*background-color:red;*/
 		    color:black;
 		    text-align:center;
 		    padding:5px;
 		}
 
 		#section {
-		    width:350px;
-		    float:left;
+
+		    width:55%;
+		    float:center;
 		    padding:10px;	 	 
 		}
 		#footer {
@@ -36,6 +36,8 @@
 
 		body {
 			font-family: 'Roboto Slab', serif;
+			background-image: url("background.jpg");
+			background-size: 2800px 1400px;
 		}
 	</style>
 
@@ -51,7 +53,10 @@
 
 
 <body onload="init()" onkeydown = "printKey(event)">
+
+
 	
+
 	<div id="header">
 	<h1 style="margin-bottom:0;">Moped Mayhem</h1>
 	<h2>Aid to Cambodia</h2>
@@ -63,23 +68,27 @@
   	
   	<center><canvas id="demoCanvas" width="500" height="550" class= "center"></canvas></center>
 	
+<center>
 
+	<div id="section">
 
+			
+				<h3><big>Many third world countries lack accessible and affordable healthcare. According to World Bank, Cambodia has 0.2 doctors for every 1,000 people. Cambodia experienced a horrible genocide and communistic tyranny from 1975 to 1979 that took the lifes about a fourth of the population and almost all of the educated people. Cambodia is still struggling to recover from that tragedy. </big></h3>
 
-	<div id="section"><!-- 
-		<div style = "position: fixed; top: 400px; left: 100px">Info</div>
-		<div style = "position: fixed; top: 400px; left: 550px"= >Donate</div> -->
-		<table width="90%" cellpadding="200">
-		  <tr>
-		    <td>Info Info Info Info Info Info Info...................................
-		    <p style="float: right"><a href="#" class="buttonI">More Info</a></p></td>
-		    <td><a href="http://www.sihosp.org/" class="buttonD">Donate</a></td>
+				<h3><big>One of our team members traveled to Cambodia this year on a medical missions trip. If you would like to learn more please click 'More Info' below.</big></h3>
+				<p id = M><a href="#" class="buttonI">More Info</a></p>
+			
+	
+		
+			<h4 width="200"><big>If you would like to donate today please click the button below, which will lead you to Sihanouk Hospital Center of HOPE, a nonprofit hospital which works to provide free and more accessible healthcare to the disadvantaged in Cambodia.</big></h4>
 
-
-		  </tr>
-		</table>
+			<p><a href="http://www.sihosp.org/" class="buttonD">Donate</a></p>
+		
 
 	</div>
+</center>
+
+
 
 
 
