@@ -15,14 +15,17 @@ function Entity (w,h,m,xPos,yPos,img) {
 	this.imageSource = img;
 }
 
-function Character (xPos, yPos, img){
+function Character (xPos, yPos, imgB, imgF, imgR, imgL){
 	this.x = xPos;
 	this.y = yPos;
 	this.points = 0;
 	if (!tileAvailable(this.x,this.y)) {
 		this.x++;
 	}
-	this.img = img;
+	this.imgB = imgB;
+	this.imgF = imgF;
+	this.imgR = imgR;
+	this.imgL = imgL;
 }
 
 //Constructor for Tile Class
@@ -208,7 +211,9 @@ Grid.prototype.shiftDown = function() {
 };
 // creates the grid
 var grid = new Grid();
-var character = new Character(5,10,"");
+
+var character = new Character(5,10,"testImages/nurse-b.png", "testImages/nurse-f.png",
+	"testImages/nurse-r.png", "testImages/nurse-l.png");//CHARACTER IS HERE STEPHANIE!!!!!!!!!!!!!
 
 
 
@@ -276,13 +281,18 @@ function loadImages() {
 	queue.on("complete", handleComplete, this);
 	queue.loadManifest(["testImages/water.png", "testImages/ground.jpg", "testImages/road.png",
 		"testImages/medical-kit.png", "testImages/boat.png", "testImages/tree.png", 
-		"testImages/temp-tile.png", "testImages/mopeds.png","testImages/temple.png","testImages/house.png"]);//Works now, but it's hard coded
+		"testImages/mopeds.png", "testImages/nurse-f.png", 
+		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png",
+		"testImages/temple.png","testImages/house.png"]);//Works now, but it's hard coded
+
 	console.log("images loaded");
 	//preload.loadFile("assets/preloadjs-bg-center.png");
 }
 
 function handleComplete(event) {
 	drawTiles();
+
+	drawChar();
 }
 
 function drawTiles() {
@@ -316,6 +326,14 @@ function drawTiles() {
 
 }
 
+function drawChar(){
+	var image = queue.getResult(character.imgB);
+	var bitmap = new createjs.Bitmap(image);	         	
+	stage.addChild(bitmap);
+	bitmap.x = character.x * TILE_WIDTH;
+	bitmap.y = character.y * TILE_WIDTH;  
+	stage.update();	    		
+}
 
 
 
@@ -336,26 +354,42 @@ function printKey(e){
 
 	if (gameOver == false) {
 
-	if(e.keyCode === 37){
-		console.log("left");
-		if (character.x > 0 && tileAvailable(character.x-1,character.y)) {
-	  		character.x-=1;
-		}
-	}
 
-	if(e.keyCode === 38){
-	  console.log("up");
-	  if (tileAvailable(character.x,character.y-1)) {
-	  	grid.shiftDown();			
-	  }	  
-	}
+		if(e.keyCode === 65){
+			console.log("left");
+			if (character.x > 0 && tileAvailable(character.x-1,character.y)) {
+		  		character.x-=1;
+			}
+			else {
+				console.log("game over");
+				gameOver = true;
+			}
 
-	if(e.keyCode === 39){
-		console.log("right");
-		if (character.x < GRID_WIDTH - 1 && tileAvailable(character.x+1,character.y)) {
-	  		character.x+=1;
 		}
-	}
+
+		if(e.keyCode === 87){
+		  console.log("up");
+		  if (tileAvailable(character.x,character.y-1)) {
+		  	grid.shiftDown();			
+		  }
+		  else {
+		  	console.log("game over");
+		  	gameOver = true;
+		  }
+		  
+		}
+
+		if(e.keyCode === 68){
+			console.log("right");
+			if (character.x < GRID_WIDTH - 1 && tileAvailable(character.x+1,character.y)) {
+		  		character.x+=1;
+			}
+			else {
+				console.log("game over");
+				gameOver = true;
+			}
+		}
+	
 
 	// if(e.keyCode === 40){
 	//   console.log("down");
@@ -363,6 +397,8 @@ function printKey(e){
 	// }
 	}
 	drawTiles();
+	drawChar();
+
 }	
 
 
