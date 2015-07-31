@@ -36,9 +36,10 @@ Tile.prototype.shiftDown = function() {
 };
 
 //Constructor for Movable Class
-function Movable (w,h,m,xPos,yPos,img,xDir) {
+function Movable (w,h,m,xPos,yPos,img,xDir,kill) {
 	Entity.call(this,w,h,m,xPos,yPos,img);
 	this.xMove = xDir;
+	this.willKill = kill;
 } 
 
 Movable.prototype.move = function() {
@@ -62,26 +63,26 @@ function Ground (x,y) {
 
 //Moped constructor
 function Moped (x,y,dir) {
-	Movable.call(this,1,1,false,x,y,"testImages/mopeds.png",dir);
+	Movable.call(this,1,1,false,x,y,"testImages/mopeds.png",dir,true);
 }
 
 //Boat constructor
 function Boat (x,y,dir) {
-	Movable.call(this,1,1,true,x,y,"testImages/boat.png",dir);	
+	Movable.call(this,1,1,true,x,y,"testImages/boat.png",dir,false);	
 }
 
 //Medical Kit constructor
 function MedicalKit(x,y) {
-	Movable.call(this,1,1,true,x,y,"",0);
+	Movable.call(this,1,1,true,x,y,"",0,false);
 }
 
 //Building constructor
 function Building(x,y) {
-	Movable.call(this,1,1,false,x,y,"",0);
+	Movable.call(this,1,1,false,x,y,"",0,false);
 }
 
 function Tree(x,y) {
-	Movable.call(this,1,1,false,x,y,"",0);
+	Movable.call(this,1,1,false,x,y,"",0,false);
 }
 
 // constructor for tileRow
@@ -204,6 +205,7 @@ function tileAvailable (x,y) {
 	var tile = grid.rows[y].tiles[x];
 	if (tile.canMoveOnto == false && tile.occupyingObject == false) {
 		console.log("the tile can't be moved onto and there is nothing occupying it");
+		gameOver = true;
 		return false;
 	}
 	else if (tile.occupyingObject == false && tile.canMoveOnto == true) {
@@ -224,6 +226,9 @@ function tileAvailable (x,y) {
 		}	
 		else {
 			console.log("the tile has an object occupying it that can't be moved onto");
+			if (tile.occupyingObject.willKill) {
+				gameOver = true;	
+			}
 			return false;
 		}
 	}
@@ -233,6 +238,7 @@ function tileAvailable (x,y) {
 	}
 	else {
 		console.log("default false");
+		gameOver = true;
 		return false;
 	}
 }
@@ -328,33 +334,19 @@ function printKey(e){
 		if (character.x > 0 && tileAvailable(character.x-1,character.y)) {
 	  		character.x-=1;
 		}
-		else {
-			console.log("game over");
-			gameOver = true;
-		}
-
 	}
 
 	if(e.keyCode === 38){
 	  console.log("up");
 	  if (tileAvailable(character.x,character.y-1)) {
 	  	grid.shiftDown();			
-	  }
-	  else {
-	  	console.log("game over");
-	  	gameOver = true;
-	  }
-	  
+	  }	  
 	}
 
 	if(e.keyCode === 39){
 		console.log("right");
 		if (character.x < GRID_WIDTH - 1 && tileAvailable(character.x+1,character.y)) {
 	  		character.x+=1;
-		}
-		else {
-			console.log("game over");
-			gameOver = true;
 		}
 	}
 
