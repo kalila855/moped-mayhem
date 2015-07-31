@@ -39,7 +39,7 @@ function Movable (w,h,m,xPos,yPos,img,xDir) {
 
 //Road Tile constructor
 function Road (x,y) {
-	Tile.call(this,1,1,true,x,y,"testImages/road.jpg");
+	Tile.call(this,1,1,true,x,y,"testImages/road.png");
 }
 
 //River constructor
@@ -49,17 +49,17 @@ function River (x,y) {
 
 //Ground Tile constructor
 function Ground (x,y) {
-	Tile.call(this,1,1,true,x,y,"testImages/temp-tile.png");
+	Tile.call(this,1,1,true,x,y,"testImages/ground.jpg");
 }
 
 //Moped constructor
 function Moped (x,y,dir) {
-	Movable.call(this,1,1,false,x,y,"",dir);
+	Movable.call(this,1,1,false,x,y,"testImages/mopeds.png",dir);
 }
 
 //Boat constructor
 function Boat (x,y,dir) {
-	Movable.call(this,1,1,true,x,y,"",dir);	
+	Movable.call(this,1,1,true,x,y,"testImages/boat.png",dir);	
 }
 
 //Medical Kit constructor
@@ -217,16 +217,32 @@ function tileAvailable (x,y) {
 	}
 }
 var stage;
+var queue;
 runGame();
 
 function runGame() {
 	$(document).ready(function(){
+		
 		console.log("ready");
 		stage = new createjs.Stage("demoCanvas");
-		drawTiles();
+		loadImages();
+		//drawTiles();
    
 
 	});
+}
+
+
+function loadImages() {
+	queue = new createjs.LoadQueue(false);//true loads file as XHR, whatever that means
+	queue.on("complete", handleComplete, this);
+	queue.loadManifest(["testImages/water.png", "testImages/ground.jpg", "testImages/road.png"]);//Not likely to work.
+	console.log("images loaded");
+	//preload.loadFile("assets/preloadjs-bg-center.png");
+}
+
+function handleComplete(event) {
+	drawTiles();
 }
 
 function drawTiles() {
@@ -234,29 +250,28 @@ function drawTiles() {
 	for(var row = 0; row < grid.rows.length; row++) {
 		var tileRow = grid.rows[row];
 		var arrayOfTiles = tileRow.tiles;
-		
+		//Drawing the tiles
 		for(var col = 0; col < arrayOfTiles.length; col++) {
 			var tile = arrayOfTiles[col];
-			//console.log("tiles");
 			
-			var image = new Image();
-    		image.src = tile.imageSource;
+			
+				var image = queue.getResult(tile.imageSource);
     	//	image.src = "testImages/road.jpg";
 
     		//console.log(tile.x + " : " + tile.y);
     		
 	    		var bitmap = new createjs.Bitmap(image);
-	       		console.log("image loaded");
+	       		
 	         	
 	         	stage.addChild(bitmap);
 	         	bitmap.x = tile.x * TILE_WIDTH;
 	         	bitmap.y = tile.y * TILE_WIDTH;  
 
-	         	console.log(bitmap.x + " : " + bitmap.y);  
+	         	//console.log(bitmap.x + " : " + bitmap.y);  
 	         	
-	         $(image).load(function(){
+	       //  $(image).load(function(){
 				stage.update();
-         	 });	
+         	// });	
    			
 
     		
