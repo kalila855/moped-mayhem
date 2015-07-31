@@ -42,7 +42,7 @@ function Movable (w,h,m,xPos,yPos,img,xDir) {
 } 
 
 Movable.prototype.move = function() {
-	this.x += this.xMove;
+	this.x += this.xMove; //
 };
 
 //Road Tile constructor
@@ -263,7 +263,22 @@ function loadImages() {
 
 function handleComplete(event) {
 	drawTiles();
+	drawObjects(false);
+	setOffTicker();
 }
+
+function setOffTicker() {  
+	createjs.Ticker.setFPS(2);
+    createjs.Ticker.addEventListener("tick", handleTick);
+
+}                   
+function handleTick(event) {
+     // Actions carried out each tick (aka frame)
+    if (!event.paused) {
+     	drawObjects(true);  
+         // Actions carried out when the Ticker is not paused.
+	}	   
+ }
 
 function drawTiles() {
 	console.log("draw tiles");
@@ -282,6 +297,15 @@ function drawTiles() {
 		}
 		
 		//Make separate method later to draw the objects
+		
+	}
+
+}
+
+function drawObjects(moving) {
+	console.log("draw objects");
+	for(var row = 0; row < grid.rows.length; row++) {
+		var tileRow = grid.rows[row];
 		var arrayOfObjects = tileRow.objects;
 		for(var col = 0; col < arrayOfObjects.length; col++) {
 			var object = arrayOfObjects[col];						
@@ -292,8 +316,7 @@ function drawTiles() {
 	        bitmap.y = object.y * TILE_WIDTH;  
 			stage.update();	    		
 		}
-	}
-
+	}	
 }
 
 
