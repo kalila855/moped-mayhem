@@ -19,6 +19,7 @@ function Character (xPos, yPos, img){
 	this.x = xPos;
 	this.y = yPos;
 	this.img = img;
+	this.points = 0;
 }
 
 //Constructor for Tile Class
@@ -36,6 +37,10 @@ function Movable (w,h,m,xPos,yPos,img,xDir) {
 	Entity.call(this,w,h,m,xPos,yPos,img);
 	this.xMove = xDir;
 } 
+
+Movable.prototype.move = function() {
+	this.x += this.xMove;
+};
 
 //Road Tile constructor
 function Road (x,y) {
@@ -77,11 +82,10 @@ function Tree(x,y) {
 }
 
 // constructor for tileRow
-function tileRow (y) {
+function tileRow (y,rowType) {
 	this.tiles = [];
 	this.objects = [];
 	this.y = y;
-	var rowType = Math.round(Math.random()*5);
 	if (rowType === 0) {
 		for (var i = 0; i < GRID_WIDTH; i++) {
 			this.tiles[i] = new Ground(i,y);
@@ -109,7 +113,7 @@ function tileRow (y) {
 		}
 		console.log("creating Ground");
 	}
-	else if (rowType < 3) {
+	else if (rowType === 1) {
 		var dir = Math.round(Math.random(2));
 		if (dir === 0) {
 			dir -= 1;
@@ -161,9 +165,14 @@ tileRow.prototype.shiftDown = function() {
 //constructor for the grid
 function Grid () {
 	this.rows = [];
-	for (var i = 0; i < GRID_HEIGHT; i++) {
-		this.rows.push(new tileRow(i));
+	for (var i = 0; i < GRID_HEIGHT - 1; i++) {
+		var rowType = Math.round(Math.random()*4);
+		if (rowType > 1) {
+			rowType -= 1;
+		}
+		this.rows.push(new tileRow(i,rowType));
 	}
+	this.rows.push(new tileRow(GRID_HEIGHT - 1, 0));
 }
 
 //shifts the grid down by one
@@ -176,7 +185,11 @@ Grid.prototype.shiftDown = function() {
 			curRow.tiles[j].y++;
 		}
 	}
-	this.rows.unshift(new tileRow(0));
+	var rowType = Math.round(Math.random()*4);
+	if (rowType > 1) {
+		rowType -= 1;
+	}
+	this.rows.unshift(new tileRow(0,rowType));
 };
 // creates the grid
 var grid = new Grid();
@@ -198,7 +211,14 @@ function tileAvailable (x,y) {
 		return true;
 	}
 	else if (tile.occupyingObject) {
-		if (tile.occupyingObject.canMoveOnto == true) {
+		if (tile.occupyingObject instanceOf MedicalKit) {
+			console.log("you collected a MedicalKit");
+			var medicalIndex = grid.rows[y].objects.indexOf(tile.occupyingObject);
+			grid.rows[y].objects.splice(medicalIndex,1);
+			character.points++;
+			return true;
+		}
+		else if (tile.occupyingObject.canMoveOnto == true) {
 			console.log("the tile has an object occupying it that can be moved onto");
 			return true;
 		}	
@@ -297,6 +317,7 @@ function init() {
 var character = new Character(5,10,"");
 
 
+
 function printKey(e){
 	console.log(e.keyCode);
 
@@ -342,6 +363,7 @@ function printKey(e){
 	//   character.y+=1;
 	// }
 	}
+	drawTiles();
 }	
 
 
