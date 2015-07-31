@@ -37,6 +37,10 @@ function Movable (w,h,m,xPos,yPos,img,xDir) {
 	this.xMove = xDir;
 } 
 
+Movable.prototype.move = function() {
+	this.x += this.xMove;
+};
+
 //Road Tile constructor
 function Road (x,y) {
 	Tile.call(this,1,1,true,x,y,"testImages/road.jpg");
@@ -77,11 +81,10 @@ function Tree(x,y) {
 }
 
 // constructor for tileRow
-function tileRow (y) {
+function tileRow (y,rowType) {
 	this.tiles = [];
 	this.objects = [];
 	this.y = y;
-	var rowType = Math.round(Math.random()*5);
 	if (rowType === 0) {
 		for (var i = 0; i < GRID_WIDTH; i++) {
 			this.tiles[i] = new Ground(i,y);
@@ -109,7 +112,7 @@ function tileRow (y) {
 		}
 		console.log("creating Ground");
 	}
-	else if (rowType < 3) {
+	else if (rowType === 1) {
 		var dir = Math.round(Math.random(2));
 		if (dir === 0) {
 			dir -= 1;
@@ -161,9 +164,14 @@ tileRow.prototype.shiftDown = function() {
 //constructor for the grid
 function Grid () {
 	this.rows = [];
-	for (var i = 0; i < GRID_HEIGHT; i++) {
-		this.rows.push(new tileRow(i));
+	for (var i = 0; i < GRID_HEIGHT - 1; i++) {
+		var rowType = Math.round(Math.random()*4);
+		if (rowType > 1) {
+			rowType -= 1;
+		}
+		this.rows.push(new tileRow(i,rowType));
 	}
+	this.rows.push(new tileRow(GRID_HEIGHT - 1, 0));
 }
 
 //shifts the grid down by one
@@ -176,7 +184,11 @@ Grid.prototype.shiftDown = function() {
 			curRow.tiles[j].y++;
 		}
 	}
-	this.rows.unshift(new tileRow(0));
+	var rowType = Math.round(Math.random()*4);
+	if (rowType > 1) {
+		rowType -= 1;
+	}
+	this.rows.unshift(new tileRow(0,rowType));
 };
 // creates the grid
 var grid = new Grid();
