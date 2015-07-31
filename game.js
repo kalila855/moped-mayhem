@@ -18,8 +18,11 @@ function Entity (w,h,m,xPos,yPos,img) {
 function Character (xPos, yPos, img){
 	this.x = xPos;
 	this.y = yPos;
-	this.img = img;
 	this.points = 0;
+	if (!tileAvailable(this.x,this.y)) {
+		this.x++;
+	}
+	this.img = img;
 }
 
 //Constructor for Tile Class
@@ -193,10 +196,7 @@ Grid.prototype.shiftDown = function() {
 };
 // creates the grid
 var grid = new Grid();
-
-
-
-
+var character = new Character(5,10,"");
 
 
 
@@ -307,7 +307,7 @@ var gameOver = false;
 
 
 
-var character = new Character(5,10,"");
+
 
 
 
