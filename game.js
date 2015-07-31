@@ -340,9 +340,19 @@ function moveObjects() {
 		var arrayOfObjects = tileRow.objects;
 		for(var col = 0; col < arrayOfObjects.length; col++) {
 			var object = arrayOfObjects[col];						
-			if(object.constructor == Moped || object.constructor == Boat) {
-				console.log("MOVINGOBJECT");
-				object.x += object.xMove;  
+			if(object.constructor == Moped || object.constructor == Boat) {		 						
+				console.log("IT's WORKING");
+				object.x += object.xMove; 
+				var newObject;
+				if(object.x < 0) {
+					object.x = GRID_WIDTH - 1;
+
+				} 
+				else if(object.x > GRID_WIDTH*TILE_WIDTH) {
+					object.x = 0;
+				}
+
+				 	
 			}	 		
 		}
 	}	
