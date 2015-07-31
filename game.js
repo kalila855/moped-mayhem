@@ -28,7 +28,7 @@ function Tile (w,h,m,xPos,yPos,img) {
 	this.occupyingObject = null;
 } 
 
-Tile.prototype.shiftDown = function() {
+Entity.prototype.shiftDown = function() {
 	this.y += 1;
 };
 
@@ -69,16 +69,16 @@ function Boat (x,y,dir) {
 
 //Medical Kit constructor
 function MedicalKit(x,y) {
-	Movable.call(this,1,1,true,x,y,"",0);
+	Movable.call(this,1,1,true,x,y,"testImages/medical-kit.png",0);
 }
 
 //Building constructor
 function Building(x,y) {
-	Movable.call(this,1,1,false,x,y,"",0);
+	Movable.call(this,1,1,false,x,y,"testImages/temp-tile",0);
 }
 
 function Tree(x,y) {
-	Movable.call(this,1,1,false,x,y,"",0);
+	Movable.call(this,1,1,false,x,y,"testImages/tree.png",0);
 }
 
 // constructor for tileRow
@@ -247,8 +247,6 @@ function runGame() {
 		stage = new createjs.Stage("demoCanvas");
 		loadImages();
 		//drawTiles();
-   
-
 	});
 }
 
@@ -256,7 +254,9 @@ function runGame() {
 function loadImages() {
 	queue = new createjs.LoadQueue(false);//true loads file as XHR, whatever that means
 	queue.on("complete", handleComplete, this);
-	queue.loadManifest(["testImages/water.png", "testImages/ground.jpg", "testImages/road.png"]);//Not likely to work.
+	queue.loadManifest(["testImages/water.png", "testImages/ground.jpg", "testImages/road.png",
+		"testImages/medical-kit.png", "testImages/boat.png", "testImages/tree.png", 
+		"testImages/temp-tile.png", "testImages/mopeds.png"]);//Works now, but it's hard coded
 	console.log("images loaded");
 	//preload.loadFile("assets/preloadjs-bg-center.png");
 }
@@ -272,29 +272,25 @@ function drawTiles() {
 		var arrayOfTiles = tileRow.tiles;
 		//Drawing the tiles
 		for(var col = 0; col < arrayOfTiles.length; col++) {
-			var tile = arrayOfTiles[col];
-			
-			
-				var image = queue.getResult(tile.imageSource);
-    	//	image.src = "testImages/road.jpg";
-
-    		//console.log(tile.x + " : " + tile.y);
-    		
-	    		var bitmap = new createjs.Bitmap(image);
-	       		
-	         	
-	         	stage.addChild(bitmap);
-	         	bitmap.x = tile.x * TILE_WIDTH;
-	         	bitmap.y = tile.y * TILE_WIDTH;  
-
-	         	//console.log(bitmap.x + " : " + bitmap.y);  
-	         	
-	       //  $(image).load(function(){
-				stage.update();
-         	// });	
-   			
-
-    		
+			var tile = arrayOfTiles[col];						
+			var image = queue.getResult(tile.imageSource);
+	    	var bitmap = new createjs.Bitmap(image);	         	
+	        stage.addChild(bitmap);
+	        bitmap.x = tile.x * TILE_WIDTH;
+	        bitmap.y = tile.y * TILE_WIDTH;  
+			stage.update();	    		
+		}
+		
+		//Make separate method later to draw the objects
+		var arrayOfObjects = tileRow.objects;
+		for(var col = 0; col < arrayOfObjects.length; col++) {
+			var object = arrayOfObjects[col];						
+			var image = queue.getResult(object.imageSource);
+	    	var bitmap = new createjs.Bitmap(image);	         	
+	        stage.addChild(bitmap);
+	        bitmap.x = object.x * TILE_WIDTH;
+	        bitmap.y = object.y * TILE_WIDTH;  
+			stage.update();	    		
 		}
 	}
 
@@ -310,9 +306,6 @@ console.log(grid);
 var gameOver = false;
 
 
-function init() {
-    
-}
 
 var character = new Character(5,10,"");
 
