@@ -211,7 +211,7 @@ function tileAvailable (x,y) {
 		return true;
 	}
 	else if (tile.occupyingObject) {
-		if (tile.occupyingObject instanceOf MedicalKit) {
+		if (tile.occupyingObject.constructor == MedicalKit) {
 			console.log("you collected a MedicalKit");
 			var medicalIndex = grid.rows[y].objects.indexOf(tile.occupyingObject);
 			grid.rows[y].objects.splice(medicalIndex,1);
