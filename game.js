@@ -18,6 +18,10 @@ function Entity (w,h,m,xPos,yPos,img) {
 function Character (xPos, yPos, img){
 	this.x = xPos;
 	this.y = yPos;
+	this.points = 0;
+	if (!tileAvailable(this.x,this.y)) {
+		this.x++;
+	}
 	this.img = img;
 }
 
@@ -27,7 +31,7 @@ function Tile (w,h,m,xPos,yPos,img) {
 	this.occupyingObject = null;
 } 
 
-Tile.prototype.shiftDown = function() {
+Entity.prototype.shiftDown = function() {
 	this.y += 1;
 };
 
@@ -37,9 +41,13 @@ function Movable (w,h,m,xPos,yPos,img,xDir) {
 	this.xMove = xDir;
 } 
 
+Movable.prototype.move = function() {
+	this.x += this.xMove;
+};
+
 //Road Tile constructor
 function Road (x,y) {
-	Tile.call(this,1,1,true,x,y,"testImages/road.jpg");
+	Tile.call(this,1,1,true,x,y,"testImages/road.png");
 }
 
 //River constructor
@@ -49,39 +57,38 @@ function River (x,y) {
 
 //Ground Tile constructor
 function Ground (x,y) {
-	Tile.call(this,1,1,true,x,y,"testImages/temp-tile.png");
+	Tile.call(this,1,1,true,x,y,"testImages/ground.jpg");
 }
 
 //Moped constructor
 function Moped (x,y,dir) {
-	Movable.call(this,1,1,false,x,y,"",dir);
+	Movable.call(this,1,1,false,x,y,"testImages/mopeds.png",dir);
 }
 
 //Boat constructor
 function Boat (x,y,dir) {
-	Movable.call(this,1,1,true,x,y,"",dir);	
+	Movable.call(this,1,1,true,x,y,"testImages/boat.png",dir);	
 }
 
 //Medical Kit constructor
 function MedicalKit(x,y) {
-	Movable.call(this,1,1,true,x,y,"",0);
+	Movable.call(this,1,1,true,x,y,"testImages/medical-kit.png",0);
 }
 
 //Building constructor
 function Building(x,y) {
-	Movable.call(this,1,1,false,x,y,"",0);
+	Movable.call(this,1,1,false,x,y,"testImages/temp-tile",0);
 }
 
 function Tree(x,y) {
-	Movable.call(this,1,1,false,x,y,"",0);
+	Movable.call(this,1,1,false,x,y,"testImages/tree.png",0);
 }
 
 // constructor for tileRow
-function tileRow (y) {
+function tileRow (y,rowType) {
 	this.tiles = [];
 	this.objects = [];
 	this.y = y;
-	var rowType = Math.round(Math.random()*5);
 	if (rowType === 0) {
 		for (var i = 0; i < GRID_WIDTH; i++) {
 			this.tiles[i] = new Ground(i,y);
@@ -109,7 +116,7 @@ function tileRow (y) {
 		}
 		console.log("creating Ground");
 	}
-	else if (rowType < 3) {
+	else if (rowType === 1) {
 		var dir = Math.round(Math.random(2));
 		if (dir === 0) {
 			dir -= 1;
@@ -161,9 +168,14 @@ tileRow.prototype.shiftDown = function() {
 //constructor for the grid
 function Grid () {
 	this.rows = [];
-	for (var i = 0; i < GRID_HEIGHT; i++) {
-		this.rows.push(new tileRow(i));
+	for (var i = 0; i < GRID_HEIGHT - 1; i++) {
+		var rowType = Math.round(Math.random()*4);
+		if (rowType > 1) {
+			rowType -= 1;
+		}
+		this.rows.push(new tileRow(i,rowType));
 	}
+	this.rows.push(new tileRow(GRID_HEIGHT - 1, 0));
 }
 
 //shifts the grid down by one
@@ -176,14 +188,15 @@ Grid.prototype.shiftDown = function() {
 			curRow.tiles[j].y++;
 		}
 	}
-	this.rows.unshift(new tileRow(0));
+	var rowType = Math.round(Math.random()*4);
+	if (rowType > 1) {
+		rowType -= 1;
+	}
+	this.rows.unshift(new tileRow(0,rowType));
 };
 // creates the grid
 var grid = new Grid();
-
-
-
-
+var character = new Character(5,10,"");
 
 
 
@@ -198,7 +211,14 @@ function tileAvailable (x,y) {
 		return true;
 	}
 	else if (tile.occupyingObject) {
-		if (tile.occupyingObject.canMoveOnto == true) {
+		if (tile.occupyingObject.constructor == MedicalKit) {
+			console.log("you collected a MedicalKit");
+			var medicalIndex = grid.rows[y].objects.indexOf(tile.occupyingObject);
+			grid.rows[y].objects.splice(medicalIndex,1);
+			character.points++;
+			return true;
+		}
+		else if (tile.occupyingObject.canMoveOnto == true) {
 			console.log("the tile has an object occupying it that can be moved onto");
 			return true;
 		}	
@@ -217,16 +237,32 @@ function tileAvailable (x,y) {
 	}
 }
 var stage;
+var queue;
 runGame();
 
 function runGame() {
 	$(document).ready(function(){
+		
 		console.log("ready");
 		stage = new createjs.Stage("demoCanvas");
-		drawTiles();
-   
-
+		loadImages();
+		//drawTiles();
 	});
+}
+
+
+function loadImages() {
+	queue = new createjs.LoadQueue(false);//true loads file as XHR, whatever that means
+	queue.on("complete", handleComplete, this);
+	queue.loadManifest(["testImages/water.png", "testImages/ground.jpg", "testImages/road.png",
+		"testImages/medical-kit.png", "testImages/boat.png", "testImages/tree.png", 
+		"testImages/temp-tile.png", "testImages/mopeds.png"]);//Works now, but it's hard coded
+	console.log("images loaded");
+	//preload.loadFile("assets/preloadjs-bg-center.png");
+}
+
+function handleComplete(event) {
+	drawTiles();
 }
 
 function drawTiles() {
@@ -234,32 +270,27 @@ function drawTiles() {
 	for(var row = 0; row < grid.rows.length; row++) {
 		var tileRow = grid.rows[row];
 		var arrayOfTiles = tileRow.tiles;
-		
+		//Drawing the tiles
 		for(var col = 0; col < arrayOfTiles.length; col++) {
-			var tile = arrayOfTiles[col];
-			//console.log("tiles");
-			
-			var image = new Image();
-    		image.src = tile.imageSource;
-    	//	image.src = "testImages/road.jpg";
-
-    		//console.log(tile.x + " : " + tile.y);
-    		
-	    		var bitmap = new createjs.Bitmap(image);
-	       		console.log("image loaded");
-	         	
-	         	stage.addChild(bitmap);
-	         	bitmap.x = tile.x * TILE_WIDTH;
-	         	bitmap.y = tile.y * TILE_WIDTH;  
-
-	         	console.log(bitmap.x + " : " + bitmap.y);  
-	         	
-	         $(image).load(function(){
-				stage.update();
-         	 });	
-   			
-
-    		
+			var tile = arrayOfTiles[col];						
+			var image = queue.getResult(tile.imageSource);
+	    	var bitmap = new createjs.Bitmap(image);	         	
+	        stage.addChild(bitmap);
+	        bitmap.x = tile.x * TILE_WIDTH;
+	        bitmap.y = tile.y * TILE_WIDTH;  
+			stage.update();	    		
+		}
+		
+		//Make separate method later to draw the objects
+		var arrayOfObjects = tileRow.objects;
+		for(var col = 0; col < arrayOfObjects.length; col++) {
+			var object = arrayOfObjects[col];						
+			var image = queue.getResult(object.imageSource);
+	    	var bitmap = new createjs.Bitmap(image);	         	
+	        stage.addChild(bitmap);
+	        bitmap.x = object.x * TILE_WIDTH;
+	        bitmap.y = object.y * TILE_WIDTH;  
+			stage.update();	    		
 		}
 	}
 
@@ -275,11 +306,9 @@ console.log(grid);
 var gameOver = false;
 
 
-function init() {
-    
-}
 
-var character = new Character(5,10,"");
+
+
 
 
 function printKey(e){
@@ -327,6 +356,7 @@ function printKey(e){
 	//   character.y+=1;
 	// }
 	}
+	drawTiles();
 }	
 
 
