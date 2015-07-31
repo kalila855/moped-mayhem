@@ -321,7 +321,6 @@ function handleTick(event) {
  }
 
 function drawTiles() {
-	console.log("draw tiles");
 	for(var row = 0; row < grid.rows.length; row++) {
 		var tileRow = grid.rows[row];
 		var arrayOfTiles = tileRow.tiles;
