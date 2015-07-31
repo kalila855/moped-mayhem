@@ -45,7 +45,7 @@ function Movable (w,h,m,xPos,yPos,img,xDir,kill) {
 	this.willKill = kill;
 } 
 
-Movable.prototype.move = function() {
+Movable.prototype.move = function() { 
 	this.x += this.xMove; //
 };
 
@@ -305,7 +305,9 @@ function setOffTicker() {
 function handleTick(event) {
      // Actions carried out each tick (aka frame)
     if (!event.paused) {
-     	drawObjects(true);  
+     	moveObjects();
+     	drawObjects();  
+     	drawChar();
          // Actions carried out when the Ticker is not paused.
 	}	   
  }
@@ -331,9 +333,24 @@ function drawTiles() {
 	}
 
 }
+function moveObjects() {
+	for(var row = 0; row < grid.rows.length; row++) {
+		var tileRow = grid.rows[row];
+		var arrayOfObjects = tileRow.objects;
+		for(var col = 0; col < arrayOfObjects.length; col++) {
+			var object = arrayOfObjects[col];						
+			if(object.constructor == Moped || object.constructor == Boat) {
+				console.log("MOVINGOBJECT");
+				object.x += object.xMove;  
+			}	 		
+		}
+	}	
 
-function drawObjects(moving) {
+}
+
+function drawObjects() {
 	console.log("draw objects");
+	drawTiles();//Maybe this will work
 	for(var row = 0; row < grid.rows.length; row++) {
 		var tileRow = grid.rows[row];
 		var arrayOfObjects = tileRow.objects;
@@ -419,10 +436,15 @@ function printKey(e){
 	//   character.y+=1;
 	// }
 	}
+	if(gameOver) {
+		doGameOver();
+	}
 	drawTiles();
 	drawChar();
 
 }	
 
 
-
+function doGameOver() {
+	
+}
