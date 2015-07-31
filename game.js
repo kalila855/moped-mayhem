@@ -78,11 +78,11 @@ function MedicalKit(x,y) {
 
 //Building constructor
 function Building(x,y) {
-	Movable.call(this,1,1,false,x,y,"",0,false);
+	Movable.call(this,1,1,false,x,y,"testImages/temple.png",0,false);
 }
 
 function Tree(x,y) {
-	Movable.call(this,1,1,false,x,y,"testImages/temp-tile",0,false);
+	Movable.call(this,1,1,false,x,y,"testImages/tree.png",0,false);
 }
 
 // constructor for tileRow
@@ -268,7 +268,7 @@ function loadImages() {
 	queue.on("complete", handleComplete, this);
 	queue.loadManifest(["testImages/water.png", "testImages/ground.jpg", "testImages/road.png",
 		"testImages/medical-kit.png", "testImages/boat.png", "testImages/tree.png", 
-		"testImages/temp-tile.png", "testImages/mopeds.png"]);//Works now, but it's hard coded
+		"testImages/temp-tile.png", "testImages/mopeds.png","testImages/temple.png"]);//Works now, but it's hard coded
 	console.log("images loaded");
 	//preload.loadFile("assets/preloadjs-bg-center.png");
 }
