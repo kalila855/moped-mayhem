@@ -15,14 +15,17 @@ function Entity (w,h,m,xPos,yPos,img) {
 	this.imageSource = img;
 }
 
-function Character (xPos, yPos, img){
+function Character (xPos, yPos, imgB, imgF, imgR, imgL){
 	this.x = xPos;
 	this.y = yPos;
 	this.points = 0;
 	if (!tileAvailable(this.x,this.y)) {
 		this.x++;
 	}
-	this.img = img;
+	this.imgB = imgB;
+	this.imgF = imgF;
+	this.imgR = imgR;
+	this.imgL = imgL;
 }
 
 //Constructor for Tile Class
@@ -36,9 +39,10 @@ Entity.prototype.shiftDown = function() {
 };
 
 //Constructor for Movable Class
-function Movable (w,h,m,xPos,yPos,img,xDir) {
+function Movable (w,h,m,xPos,yPos,img,xDir,kill) {
 	Entity.call(this,w,h,m,xPos,yPos,img);
 	this.xMove = xDir;
+	this.willKill = kill;
 } 
 
 Movable.prototype.move = function() {
@@ -62,26 +66,34 @@ function Ground (x,y) {
 
 //Moped constructor
 function Moped (x,y,dir) {
-	Movable.call(this,1,1,false,x,y,"testImages/mopeds.png",dir);
+	Movable.call(this,1,1,false,x,y,"testImages/mopeds.png",dir,true);
 }
 
 //Boat constructor
 function Boat (x,y,dir) {
-	Movable.call(this,1,1,true,x,y,"testImages/boat.png",dir);	
+	Movable.call(this,1,1,true,x,y,"testImages/boat.png",dir,false);	
 }
 
 //Medical Kit constructor
 function MedicalKit(x,y) {
-	Movable.call(this,1,1,true,x,y,"testImages/medical-kit.png",0);
+	Movable.call(this,1,1,true,x,y,"testImages/medical-kit.png",0,false);
 }
 
 //Building constructor
 function Building(x,y) {
-	Movable.call(this,1,1,false,x,y,"testImages/temp-tile",0);
+	var whichBuild = Math.round(Math.random()*2);
+	var buildImgSrc;
+	if (whichBuild === 0) {
+		buildImgSrc = "testImages/temple.png";
+	}
+	else {
+		buildImgSrc = "testImages/house.png";
+	}
+	Movable.call(this,1,1,false,x,y,buildImgSrc,0,false);
 }
 
 function Tree(x,y) {
-	Movable.call(this,1,1,false,x,y,"testImages/tree.png",0);
+	Movable.call(this,1,1,false,x,y,"testImages/tree.png",0,false);
 }
 
 // constructor for tileRow
@@ -109,7 +121,7 @@ function tileRow (y,rowType) {
 			}
 			this.objects.push(object);
 			this.tiles[curX].occupyingObject = object;
-			curX += Math.round(Math.random()*3) + 1;
+			curX += Math.round(Math.random()*3) + 2;
 			if (curX >= GRID_WIDTH) {
 				break;
 			}
@@ -187,6 +199,9 @@ Grid.prototype.shiftDown = function() {
 		for (var j = 0; j < this.rows[i].tiles.length; j++) {
 			curRow.tiles[j].y++;
 		}
+		for (var j = 0; j < this.rows[i].objects.length; j++) {
+			curRow.objects[j].y++;
+		}
 	}
 	var rowType = Math.round(Math.random()*4);
 	if (rowType > 1) {
@@ -196,7 +211,9 @@ Grid.prototype.shiftDown = function() {
 };
 // creates the grid
 var grid = new Grid();
-var character = new Character(5,10,"");
+
+var character = new Character(5,10,"testImages/nurse-b.png", "testImages/nurse-f.png",
+	"testImages/nurse-r.png", "testImages/nurse-l.png");//CHARACTER IS HERE STEPHANIE!!!!!!!!!!!!!
 
 
 
@@ -204,6 +221,8 @@ function tileAvailable (x,y) {
 	var tile = grid.rows[y].tiles[x];
 	if (tile.canMoveOnto == false && tile.occupyingObject == false) {
 		console.log("the tile can't be moved onto and there is nothing occupying it");
+		gameOver = true;
+		console.log("game over");
 		return false;
 	}
 	else if (tile.occupyingObject == false && tile.canMoveOnto == true) {
@@ -224,6 +243,10 @@ function tileAvailable (x,y) {
 		}	
 		else {
 			console.log("the tile has an object occupying it that can't be moved onto");
+			if (tile.occupyingObject.willKill) {
+				gameOver = true;	
+				console.log("game over");
+			}
 			return false;
 		}
 	}
@@ -233,7 +256,9 @@ function tileAvailable (x,y) {
 	}
 	else {
 		console.log("default false");
-		return false;
+		gameOver = true;
+		console.log("game over");
+		return true;
 	}
 }
 var stage;
@@ -256,17 +281,22 @@ function loadImages() {
 	queue.on("complete", handleComplete, this);
 	queue.loadManifest(["testImages/water.png", "testImages/ground.jpg", "testImages/road.png",
 		"testImages/medical-kit.png", "testImages/boat.png", "testImages/tree.png", 
-		"testImages/temp-tile.png", "testImages/mopeds.png"]);//Works now, but it's hard coded
+		"testImages/mopeds.png", "testImages/nurse-f.png", 
+		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png",
+		"testImages/temple.png","testImages/house.png"]);//Works now, but it's hard coded
+
 	console.log("images loaded");
 	//preload.loadFile("assets/preloadjs-bg-center.png");
 }
 
 function handleComplete(event) {
 	drawTiles();
+
 	drawObjects(false);
 	setOffTicker();
-}
+	drawChar();
 
+}
 function setOffTicker() {  
 	createjs.Ticker.setFPS(2);
     createjs.Ticker.addEventListener("tick", handleTick);
@@ -319,6 +349,14 @@ function drawObjects(moving) {
 	}	
 }
 
+function drawChar(){
+	var image = queue.getResult(character.imgB);
+	var bitmap = new createjs.Bitmap(image);	         	
+	stage.addChild(bitmap);
+	bitmap.x = character.x * TILE_WIDTH;
+	bitmap.y = character.y * TILE_WIDTH;  
+	stage.update();	    		
+}
 
 
 
@@ -339,40 +377,42 @@ function printKey(e){
 
 	if (gameOver == false) {
 
-	if(e.keyCode === 37){
-		console.log("left");
-		if (character.x > 0 && tileAvailable(character.x-1,character.y)) {
-	  		character.x-=1;
-		}
-		else {
-			console.log("game over");
-			gameOver = true;
+
+		if(e.keyCode === 65){
+			console.log("left");
+			if (character.x > 0 && tileAvailable(character.x-1,character.y)) {
+		  		character.x-=1;
+			}
+			else {
+				console.log("game over");
+				gameOver = true;
+			}
+
 		}
 
-	}
-
-	if(e.keyCode === 38){
-	  console.log("up");
-	  if (tileAvailable(character.x,character.y-1)) {
-	  	grid.shiftDown();			
-	  }
-	  else {
-	  	console.log("game over");
-	  	gameOver = true;
-	  }
-	  
-	}
-
-	if(e.keyCode === 39){
-		console.log("right");
-		if (character.x < GRID_WIDTH - 1 && tileAvailable(character.x+1,character.y)) {
-	  		character.x+=1;
+		if(e.keyCode === 87){
+		  console.log("up");
+		  if (tileAvailable(character.x,character.y-1)) {
+		  	grid.shiftDown();			
+		  }
+		  else {
+		  	console.log("game over");
+		  	gameOver = true;
+		  }
+		  
 		}
-		else {
-			console.log("game over");
-			gameOver = true;
+
+		if(e.keyCode === 68){
+			console.log("right");
+			if (character.x < GRID_WIDTH - 1 && tileAvailable(character.x+1,character.y)) {
+		  		character.x+=1;
+			}
+			else {
+				console.log("game over");
+				gameOver = true;
+			}
 		}
-	}
+	
 
 	// if(e.keyCode === 40){
 	//   console.log("down");
@@ -380,6 +420,8 @@ function printKey(e){
 	// }
 	}
 	drawTiles();
+	drawChar();
+
 }	
 
 
