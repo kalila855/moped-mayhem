@@ -78,7 +78,15 @@ function MedicalKit(x,y) {
 
 //Building constructor
 function Building(x,y) {
-	Movable.call(this,1,1,false,x,y,"testImages/temple.png",0,false);
+	var whichBuild = Math.round(Math.random()*2);
+	var buildImgSrc;
+	if (whichBuild === 0) {
+		buildImgSrc = "testImages/temple.png";
+	}
+	else {
+		buildImgSrc = "testImages/house.png";
+	}
+	Movable.call(this,1,1,false,x,y,buildImgSrc,0,false);
 }
 
 function Tree(x,y) {
@@ -245,7 +253,7 @@ function tileAvailable (x,y) {
 		console.log("default false");
 		gameOver = true;
 		console.log("game over");
-		return false;
+		return true;
 	}
 }
 var stage;
@@ -268,7 +276,7 @@ function loadImages() {
 	queue.on("complete", handleComplete, this);
 	queue.loadManifest(["testImages/water.png", "testImages/ground.jpg", "testImages/road.png",
 		"testImages/medical-kit.png", "testImages/boat.png", "testImages/tree.png", 
-		"testImages/temp-tile.png", "testImages/mopeds.png","testImages/temple.png"]);//Works now, but it's hard coded
+		"testImages/temp-tile.png", "testImages/mopeds.png","testImages/temple.png","testImages/house.png"]);//Works now, but it's hard coded
 	console.log("images loaded");
 	//preload.loadFile("assets/preloadjs-bg-center.png");
 }
