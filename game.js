@@ -66,7 +66,14 @@ function Ground (x,y) {
 
 //Moped constructor
 function Moped (x,y,dir) {
-	Movable.call(this,1,1,false,x,y,"testImages/mopeds.png",dir,true);
+	var mopedImg;
+	if (dir < 0) {
+		mopedImg = "testImages/mopeds.png";
+	}
+	else {
+		mopedImg = "testImages/moped2.png";
+	}
+	Movable.call(this,1,1,false,x,y,mopedImg,dir,true);
 }
 
 //Boat constructor
@@ -284,7 +291,7 @@ function loadImages() {
 		"testImages/medical-kit.png", "testImages/boat.png", "testImages/tree.png", 
 		"testImages/mopeds.png", "testImages/nurse-f.png", 
 		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png",
-		"testImages/temple.png","testImages/house.png"]);//Works now, but it's hard coded
+		"testImages/temple.png","testImages/house.png","testImages/moped2.png"]);//Works now, but it's hard coded
 
 	console.log("images loaded");
 	//preload.loadFile("assets/preloadjs-bg-center.png");
