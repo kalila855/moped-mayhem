@@ -24,7 +24,7 @@ function TileRow (type,row,img) {// Represents a row object. Type is 0 for groun
 	// stage.addChild(bitmap);
 
 	this.shiftDown = function() {
-        this.row += 1;
+        this.row ++;
      
     }
     this.draw = function() { 	    
@@ -103,7 +103,7 @@ function Movable(xPos,yPos,speed,type,img) {	//Type: 0 for medicine bad, 1 for m
 	// var bitmap = new createjs.Bitmap(image);
 	// stage.addChild(bitmap);
 	this.shiftDown = function() {
-        this.y += 1;
+        this.y ++;
         this.yCoord += TILE_WIDTH;
     }
     this.move = function() {
@@ -187,17 +187,19 @@ function Tree(x,y) {
 	Obstacle.call(this,x,y,0,50,"testImages/tree.png");
 }
 function Game(numMoved) {
-	this.numMoved = numMoved;
+	this.score = numMoved;
+	this.numKits = 0;
 	this.inProgress = true;
 	this.shiftGame = function() {
 		shiftTileRow();
 		shiftMovables();
 		shiftObstacles();
+		this.score ++;
 	}
 }
 
 
-var game, stage, container, tileRows, obstacles, movables, character;//These will be initialized
+var game, context, stage, container, tileRows, obstacles, movables, character;//These will be initialized
 
 
 function startGame() {
@@ -206,7 +208,7 @@ function startGame() {
     context=board.getContext("2d");
     container = new createjs.Container();//DELETE
  	
- 	game = new Game(-1);
+ 	game = new Game(0);
  	stage = new createjs.Stage("demoCanvas");
  	
 	makeTileRows();
@@ -235,6 +237,7 @@ function handleTick(event) {
      	drawMovables();
      	drawObstacles();
      	drawChar();
+     	drawScores();
          // Actions carried out when the Ticker is not paused.
 	}	   
  }
@@ -375,9 +378,11 @@ function addNewObstacles(row) {//Adds new row of obstacles
 }
 function drawChar() {//Should be called constantly and check for collisions
 	var collided = movableCollision();
-	var drowned = waterCollision();
+	var fellOffEdge = isOutOfBounds();
+	
 	if(collided === 0) {
 		console.log("medicine bag collected");
+		game.numKits++;
 
 	}
 	else if(collided === 1) {
@@ -386,25 +391,30 @@ function drawChar() {//Should be called constantly and check for collisions
 	}
 	else if(collided !== -1) {
 		console.log("boat collision");
-		//character.();
+		
+		character.onBoat = true;//DELETE
 		character.speed = Math.abs(collided);
+		if(fellOffEdge == true) {
+			gameOver();
+		}
 		if(collided < 0) {
 			character.leftOnBoat();
 		}
-		else{
+		else if(collided > 0){
 			character.rightOnBoat();
 		}
-		character.draw();
+		
 		
 	}
-	
 	else {
+		character.onBoat = false;
+		var drowned = waterCollision();
 		if(drowned == true) {
 			console.log("drowned");
 			gameOver();
 		}	
-		character.draw();
 	}
+	character.draw();
 }
 
 function collides(x1, y1, w1, h1, x2, y2, w2, h2) {   //Some beautiful collision detection, box-style, copied from elsewhere
@@ -448,13 +458,31 @@ function obstacleCollision(potX, potY) { //returns true or false
         	return true;
         }
     }
+    if(potX < 0 || potX + character.width > TILE_WIDTH * GRID_WIDTH) 
+        return true;
     
     return false;
 }
+function isOutOfBounds() {
+	if(character.xCoordAct < 0 || character.xCoordAct + character.width > TILE_WIDTH * GRID_WIDTH) 
+        return true;
+    return false;
+}
 
+function drawScores() {
+	console.log("drawing score");
+    context.font = "bold 10pt arial";
+    context.fillStyle = "#FF33CC";
+    context.fillText("Score: ", 10, 20);  
+    context.fillText(game.score, 55, 20);
+    context.fillText(game.numKits, 350, 20);  
+    if(game.numKits == 1)
+    	context.fillText(" medical kit collected", 360, 20);
+    else
+    	context.fillText(" medical kits collected", 360, 20);
+}
 
 function printKey(e){
-	//console.log(e.keyCode);
 	if (e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) {
             e.preventDefault();
         }
@@ -466,9 +494,16 @@ function printKey(e){
             else if (e.keyCode == 40 && obstacleCollision(character.xCoordAct,character.yCoord + TILE_WIDTH) == false){
                 character.down();
             } else if (e.keyCode == 37 && obstacleCollision(character.xCoordAct - TILE_WIDTH,character.yCoord) == false){
-                character.left();
+                if(character.onBoat == true) 
+                	character.leftOnBoat();
+                else 
+                	character.left();
+
             } else if (e.keyCode == 39 && obstacleCollision(character.xCoordAct + TILE_WIDTH,character.yCoord) == false){
-                character.right();
+                if(character.onBoat == true) 
+                	character.rightOnBoat();
+                else 
+                	character.right();
             } 
             character.draw();
         }
