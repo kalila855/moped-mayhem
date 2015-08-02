@@ -2,457 +2,491 @@
 var GRID_WIDTH = 10;
 var GRID_HEIGHT = 11;
 var TILE_WIDTH = 50; //Tiles are 50x50 pixels
+var CHAR_SPEED = 10;
 
-
-
-//Constructor for Entitiy Class
-function Entity (w,h,m,xPos,yPos,img) {
-	this.width = w;
-	this.height = h;
-	this.canMoveOnto = m;
-	this.x = xPos;
-	this.y = yPos;
-	this.imageSource = img;
+function loadImages() {//Preloads the images
+	queue = new createjs.LoadQueue(false);//true loads file as XHR, whatever that means
+	queue.on("complete", startGame, this);
+	queue.loadManifest(["testImages/water.png", "testImages/ground.jpg", "testImages/road.png",
+		"testImages/medical-kit.png", "testImages/boat.png", "testImages/tree.png", 
+		"testImages/mopeds.png", "testImages/nurse-f.png", 
+		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png",
+		"testImages/temple.png","testImages/house.png","testImages/moped2.png"]);
 }
 
-function Character (xPos, yPos, imgB, imgF, imgR, imgL){
+function TileRow (type,row,img) {// Represents a row object. Type is 0 for ground, 1 for road and 2 for water
+	this.type = type;
+	this.row = row;
+    var image = queue.getResult(img);
+	// var bitmap = new createjs.Bitmap(image);
+	// bitmap.x = 0;
+	// bitmap.y = this.row * TILE_WIDTH;
+	// stage.addChild(bitmap);
+
+	this.shiftDown = function() {
+        this.row += 1;
+     
+    }
+    this.draw = function() { 	    
+		// bitmap.y = this.row * TILE_WIDTH;	         	   
+	   //console.log("drawing a " + this.type + " at " + this.row );   
+ 		// stage.update();	   
+ 		context.drawImage(image,0,this.row * TILE_WIDTH);		
+    }
+}
+
+function Character (xPos, yPos, onBoat, imgB, imgF, imgR, imgL){ //Represents our beautiful character
 	this.x = xPos;
 	this.y = yPos;
-	this.points = 0;
-	if (!tileAvailable(this.x,this.y)) {
-		this.x++;
+	this.xCoord = this.x * TILE_WIDTH;
+	this.xCoordAct = this.x * TILE_WIDTH + 14;//The x coordinate of the actual image
+	this.yCoord = this.y * TILE_WIDTH;//Should currently be 100;
+	this.width = 22;
+	this.speed = CHAR_SPEED;//Onlys used when character is on a boat
+	this.onBoat = onBoat;
+	var imageB = queue.getResult(imgB);
+//	var imageF = queue.getResult(imgF);
+//	var imageR = queue.getResult(imgR);
+//	var imageL = queue.getResult(imgL);
+//	var bitmapB = new createjs.Bitmap(imageB);
+//	var bitmapF = new createjs.Bitmap(imageF);
+//	var bitmapR = new createjs.Bitmap(imageR);
+//	var bitmapL = new createjs.Bitmap(imageL);
+//	bitmapB.x = this.x * TILE_WIDTH;
+//	bitmapB.y = this.y * TILE_WIDTH;  
+//	stage.addChild(bitmapB);
+//	stage.addChild(bitmapF);
+//	stage.addChild(bitmapR);
+//	stage.addChild(bitmapL);
+
+	this.draw = function() {
+		context.drawImage(imageB,this.xCoord ,this.yCoord);	
 	}
-	this.imgB = imgB;
-	this.imgF = imgF;
-	this.imgR = imgR;
-	this.imgL = imgL;
+	this.up = function() {
+    	//this.y -= 1;
+    }
+    this.down = function() {
+    	
+    }
+    this.left = function() {
+    	//this.x -= 1;
+    	this.xCoord -= TILE_WIDTH;
+    	this.xCoordAct -= TILE_WIDTH;
+    }
+    this.right = function() {
+    	//this.x += 1;
+    	this.xCoord += TILE_WIDTH;
+    	this.xCoordAct += TILE_WIDTH;
+    }
+    this.leftOnBoat = function() {
+    	//this.x -= 1;
+    	this.xCoord -= this.speed;
+    	this.xCoordAct -= this.speed;
+    }
+    this.rightOnBoat = function() {
+    	//this.x += 1;
+    	this.xCoord += this.speed;
+    	this.xCoordAct += this.speed;
+    }
 }
 
-//Constructor for Tile Class
-function Tile (w,h,m,xPos,yPos,img) {
-	Entity.call(this,w,h,m,xPos,yPos,img);
-	this.occupyingObject = null;
-} 
-
-Entity.prototype.shiftDown = function() {
-	this.y += 1;
-};
 
 //Constructor for Movable Class
-function Movable (w,h,m,xPos,yPos,img,xDir,kill) {
-	Entity.call(this,w,h,m,xPos,yPos,img);
-	this.xMove = xDir;
-	this.willKill = kill;
+function Movable(xPos,yPos,speed,type,img) {	//Type: 0 for medicine bad, 1 for moped and 2 for boat
+	this.x = xPos;
+	this.y = yPos;
+	this.xCoord = this.x * TILE_WIDTH;//x Coordinate, used for moving
+	this.yCoord = this.y * TILE_WIDTH;
+	this.speed = speed;        //Speed can be negative
+	this.type = type;
+	var image = queue.getResult(img);
+	// var bitmap = new createjs.Bitmap(image);
+	// stage.addChild(bitmap);
+	this.shiftDown = function() {
+        this.y += 1;
+        this.yCoord += TILE_WIDTH;
+    }
+    this.move = function() {
+    	this.xCoord += this.speed; 
+    }
+    this.draw = function() {
+    	// bitmap.x = this.xCoord;
+	    // bitmap.y = this.y * TILE_WIDTH;  
+ 		// stage.update();	 
+ 		context.drawImage(image, this.xCoord, this.y * TILE_WIDTH);	
+
+    }
+    this.outOfBounds = function(){
+    	return ((this.xCoord + TILE_WIDTH) < 0 || this.xCoord > GRID_WIDTH*TILE_WIDTH);
+    }
 } 
 
-Movable.prototype.move = function() { 
-	this.x += this.xMove; //
-};
+function Obstacle(xPos,yPos,offset,width,img) {	
+	this.x = xPos;
+	this.y = yPos;
+	this.xCoordAct = xPos * TILE_WIDTH + offset;
+	this.width = width;
+	var image = queue.getResult(img);
+	this.shiftDown = function() {
+        this.y = this.y + 1;
 
+    }
+    this.draw = function() {
+ 		context.drawImage(image, this.x * TILE_WIDTH, this.y * TILE_WIDTH);	
+    }
+} 
+
+//Ground Tile constructor
+function Ground (row) {
+	TileRow.call(this,0,row,"testImages/ground.jpg");
+}
 //Road Tile constructor
-function Road (x,y) {
-	Tile.call(this,1,1,true,x,y,"testImages/road.png");
+function Road (row) {
+	TileRow.call(this,1,row,"testImages/road.png");
 }
 
 //River constructor
-function River (x,y) {
-	Tile.call(this,1,1,false,x,y,"testImages/water.png");
+function River (row) {
+	TileRow.call(this,2,row,"testImages/water.png");
 }
 
-//Ground Tile constructor
-function Ground (x,y) {
-	Tile.call(this,1,1,true,x,y,"testImages/ground.jpg");
-}
+
 
 //Moped constructor
-function Moped (x,y,dir) {
+function Moped (x,y,speed) {
 	var mopedImg;
-	if (dir < 0) {
+	if (speed < 0) {
 		mopedImg = "testImages/mopeds.png";
 	}
 	else {
 		mopedImg = "testImages/moped2.png";
 	}
-	Movable.call(this,1,1,false,x,y,mopedImg,dir,true);
+	Movable.call(this,x,y,speed,1, mopedImg);
 }
 
 //Boat constructor
-function Boat (x,y,dir) {
-	Movable.call(this,1,1,true,x,y,"testImages/boat.png",dir,false);	
+function Boat (x,y,speed) {
+	Movable.call(this,x,y,speed,2,"testImages/boat.png");	
 }
 
 //Medical Kit constructor
 function MedicalKit(x,y) {
-	Movable.call(this,1,1,true,x,y,"testImages/medical-kit.png",0,false);
+	Movable.call(this,x,y,0,0,"testImages/medical-kit.png");
 }
 
 //Building constructor
 function Building(x,y) {
-	var whichBuild = Math.round(Math.random()*2);
-	var buildImgSrc;
-	if (whichBuild === 0) {
-		buildImgSrc = "testImages/temple.png";
-	}
-	else {
-		buildImgSrc = "testImages/house.png";
-	}
-	Movable.call(this,1,1,false,x,y,buildImgSrc,0,false);
+	Obstacle.call(this,x,y,6,25,"testImages/house.png");
+}
+
+function Temple(x,y) {
+	Obstacle.call(this,x,y,10, 29,"testImages/temple.png");
 }
 
 function Tree(x,y) {
-	Movable.call(this,1,1,false,x,y,"testImages/tree.png",0,false);
+	Obstacle.call(this,x,y,0,50,"testImages/tree.png");
 }
-
-// constructor for tileRow
-function tileRow (y,rowType) {
-	this.tiles = [];
-	this.objects = [];
-	this.y = y;
-	if (rowType === 0) {
-		for (var i = 0; i < GRID_WIDTH; i++) {
-			this.tiles[i] = new Ground(i,y);
-		}
-		var numOfObjects =  Math.round(Math.random()*2) + 3;
-		var curX = Math.round(Math.random()*3);
-		for (var i = 0; i < numOfObjects; i++) {
-			var objType = Math.round(Math.random()*3);
-			var object;
-			if (objType === 0) {
-				object = new MedicalKit(curX,y);
-			}
-			else if (objType === 1) {
-				object = new Building(curX,y);
-			}
-			else  {
-				object = new Tree(curX,y);
-			}
-			this.objects.push(object);
-			this.tiles[curX].occupyingObject = object;
-			curX += Math.round(Math.random()*3) + 2;
-			if (curX >= GRID_WIDTH) {
-				break;
-			}
-		}
-		//makes ground
-	}
-	else if (rowType === 1) {
-		var dir = Math.round(Math.random(2));
-		if (dir === 0) {
-			dir -= 1;
-		}
-		for (var i = 0; i < GRID_WIDTH; i++) {
-			this.tiles[i] = new Road(i,y);
-		}
-		var numOfMopeds = Math.round(Math.random()*2) + 3;
-		var curX = Math.round(Math.random()*3);
-		for (var i = 0; i < numOfMopeds; i++) {
-			var moped = new Moped(curX,y,dir);
-			this.objects.push(moped);
-			this.tiles[curX].occupyingObject = moped;
-			curX += Math.round(Math.random()*3) + 2;
-			if (curX >= GRID_WIDTH - 1) {
-				break;
-			}
-		}	
-		//creates road^^
-	}
-	else {
-		var dir = Math.round(Math.random()*2);
-		if (dir === 0) {
-			dir -= 1;
-		}
-		for (var i = 0; i < GRID_WIDTH; i++) {
-			this.tiles[i] = new River(i,y);
-		}
-		var numOfBoats = Math.round(Math.random()*2) + 3;
-		var curX = Math.round(Math.random()*3);
-		for (var i = 0; i < numOfBoats; i++) {
-			var boat = new Boat(curX,y,dir);
-			this.objects.push(boat);
-			this.tiles[curX].occupyingObject = boat;
-			curX += Math.round(Math.random()*3) + 2;
-			if (curX >= GRID_WIDTH - 1) {
-				break;
-			}
-		}	
-		//create river
+function Game(numMoved) {
+	this.numMoved = numMoved;
+	this.inProgress = true;
+	this.shiftGame = function() {
+		shiftTileRow();
+		shiftMovables();
+		shiftObstacles();
 	}
 }
 
-//increases the y of a tileRow by one
-tileRow.prototype.shiftDown = function() {
-	this.y++;	
-};
 
-//constructor for the grid
-function Grid () {
-	this.rows = [];
-	for (var i = 0; i < GRID_HEIGHT - 1; i++) {
-		var rowType = Math.round(Math.random()*4);
-		if (rowType > 1) {
-			rowType -= 1;
-		}
-		this.rows.push(new tileRow(i,rowType));
-	}
-	this.rows.push(new tileRow(GRID_HEIGHT - 1, 0));
-}
-
-//shifts the grid down by one
-Grid.prototype.shiftDown = function() {
-	this.rows.pop();
-	for (var i = 0; i < this.rows.length; i++) {
-		var curRow = this.rows[i];
-		curRow.shiftDown();
-		for (var j = 0; j < this.rows[i].tiles.length; j++) {
-			curRow.tiles[j].y++;
-		}
-		for (var j = 0; j < this.rows[i].objects.length; j++) {
-			curRow.objects[j].y++;
-		}
-	}
-	var rowType = Math.round(Math.random()*4);
-	if (rowType > 1) {
-		rowType -= 1;
-	}
-	this.rows.unshift(new tileRow(0,rowType));
-};
-// creates the grid
-var grid = new Grid();
-
-var character = new Character(5,10,"testImages/nurse-b.png", "testImages/nurse-f.png",
-	"testImages/nurse-r.png", "testImages/nurse-l.png");//CHARACTER IS HERE STEPHANIE!!!!!!!!!!!!!
+var game, stage, container, tileRows, obstacles, movables, character;//These will be initialized
 
 
-
-function tileAvailable (x,y) {
-	var tile = grid.rows[y].tiles[x];
-	if (tile.canMoveOnto == false && tile.occupyingObject == false) {
-		console.log("the tile can't be moved onto and there is nothing occupying it");
-		gameOver = true;
-		console.log("game over");
-		return false;
-	}
-	else if (tile.occupyingObject == false && tile.canMoveOnto == true) {
-		console.log("the tile can be moved onto and there isn't something occupying it");
-		return true;
-	}
-	else if (tile.occupyingObject) {
-		if (tile.occupyingObject.constructor == MedicalKit) {
-			console.log("you collected a MedicalKit");
-			var medicalIndex = grid.rows[y].objects.indexOf(tile.occupyingObject);
-			grid.rows[y].objects.splice(medicalIndex,1);
-			character.points++;
-			return true;
-		}
-		else if (tile.occupyingObject.canMoveOnto == true) {
-			console.log("the tile has an object occupying it that can be moved onto");
-			return true;
-		}	
-		else {
-			console.log("the tile has an object occupying it that can't be moved onto");
-			if (tile.occupyingObject.willKill) {
-				gameOver = true;	
-				console.log("game over");
-				return true;
-			}
-			return false;
-		}
-	}
-	else if (tile.canMoveOnto) {
-		console.log("the tile can be moved onto");
-		return true;
-	}
-	else {
-		console.log("default false");
-		gameOver = true;
-		console.log("game over");
-		return true;
-	}
-}
-var stage;
-var queue;
-runGame();
-
-function runGame() {
-	$(document).ready(function(){
-		
-		console.log("ready");
-		stage = new createjs.Stage("demoCanvas");
-		loadImages();
-		//drawTiles();
-	});
-}
-
-
-function loadImages() {
-	queue = new createjs.LoadQueue(false);//true loads file as XHR, whatever that means
-	queue.on("complete", handleComplete, this);
-	queue.loadManifest(["testImages/water.png", "testImages/ground.jpg", "testImages/road.png",
-		"testImages/medical-kit.png", "testImages/boat.png", "testImages/tree.png", 
-		"testImages/mopeds.png", "testImages/nurse-f.png", 
-		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png",
-		"testImages/temple.png","testImages/house.png","testImages/moped2.png"]);//Works now, but it's hard coded
-
-	//images should be loaded
-	//preload.loadFile("assets/preloadjs-bg-center.png");
-}
-
-function handleComplete(event) {
-	drawTiles();
-
-	drawObjects(false);
+function startGame() {
+	
+	board = document.getElementById("demoCanvas");
+    context=board.getContext("2d");
+    container = new createjs.Container();//DELETE
+ 	
+ 	game = new Game(-1);
+ 	stage = new createjs.Stage("demoCanvas");
+ 	
+	makeTileRows();
+	console.log(tileRows);	
+	drawTileRow();
+	console.log(tileRows);
+	makeMovablesAndObstacles();
+	console.log(movables);	
+	console.log(obstacles);
 	setOffTicker();
-	drawChar();
+	character = new Character(GRID_WIDTH/2,GRID_HEIGHT-1,false, "testImages/nurse-b.png", "testImages/nurse-f.png",
+  	"testImages/nurse-r.png", "testImages/nurse-l.png");
+		
 
 }
+
 function setOffTicker() {  
-	createjs.Ticker.setFPS(2);
+	createjs.Ticker.setFPS(30);
     createjs.Ticker.addEventListener("tick", handleTick);
 
 }                   
 function handleTick(event) {
      // Actions carried out each tick (aka frame)
     if (!event.paused) {
-     	moveObjects();
-     	drawObjects();  
+    	drawTileRow();
+     	drawMovables();
+     	drawObstacles();
      	drawChar();
          // Actions carried out when the Ticker is not paused.
 	}	   
  }
 
-function drawTiles() {
-	for(var row = 0; row < grid.rows.length; row++) {
-		var tileRow = grid.rows[row];
-		var arrayOfTiles = tileRow.tiles;
-		//Drawing the tiles
-		for(var col = 0; col < arrayOfTiles.length; col++) {
-			var tile = arrayOfTiles[col];						
-			var image = queue.getResult(tile.imageSource);
-	    	var bitmap = new createjs.Bitmap(image);	         	
-	        stage.addChild(bitmap);
-	        bitmap.x = tile.x * TILE_WIDTH;
-	        bitmap.y = tile.y * TILE_WIDTH;  
-			stage.update();	    		
+
+function makeTileRows () {// initializes backgound of game with tileRows
+	tileRows = [];
+	for(var i = 0; i<GRID_HEIGHT-2; i++) {
+		tileRows.push(getNewTileRow(i));
+	}
+	tileRows.push(new Ground(GRID_HEIGHT-2)); //This makes sure there is ground row at bottom
+	tileRows.push(new Ground(GRID_HEIGHT-1));
+}
+function shiftTileRow() {
+	tileRows.unshift(getNewTileRow(-1));//Adds a tile to beginning of array
+	tileRows.pop();//Removes the last element in the array
+	for(var i = 0; i<tileRows.length; i++) {
+		tileRows[i].shiftDown();	
+	}
+	console.log(tileRows);	
+	//game.numMoved++;	
+}
+
+function drawTileRow () {
+	for(var i = 0; i<tileRows.length; i++) {
+		tileRows[i].draw();
+	}
+}
+
+function getNewTileRow(row) {
+	var rand = Math.floor(Math.random()*3);//This returns 0, 1, or 2 in equal proportions
+	if(rand === 0) {
+		return new Road(row);	
+	}
+	else if(rand === 1)  {
+		return new River(row);	
+	}
+	else {
+		return new Ground(row);	
+	}
+}
+
+function makeMovablesAndObstacles() {//Initializes the array of boats and mopeds
+	movables = [];
+	obstacles = [];
+	for(var i = 0; i<tileRows.length; i++) {
+		var type = tileRows[i].type;
+		addNewMovables(type, i);//Adds row of movables 
+		if(type === 0) {
+			addNewObstacles(i);
 		}
-		
-		//Make separate method later to draw the objects
+	}
+}
+function shiftMovables() {
+	for(var i = 0; i<movables.length; i++) {
+		movables[i].shiftDown();
+		if(movables[i].y >= GRID_HEIGHT) {//chops off elements that are no longer on the screen
+			movables.splice(i, 1);
+			i--;
+		}
+	}
+	if(tileRows[0].type === 0) {//Adds new movables
+		addNewMovables(0, 0);
+	}
+	else if(tileRows[0].type === 1) {
+		addNewMovables(1, 0);		
+	}
+	else {//if(tileRows[0].type === 2) {
+		addNewMovables(2, 0);
+	}
+	console.log(movables);
+	
+}
+function shiftObstacles() {
+	for(var i = 0; i<obstacles.length; i++) {
+		obstacles[i].shiftDown();
+		if(obstacles[i].y >= GRID_HEIGHT) {//chops off elements that are no longer on the screen
+			obstacles.splice(i, 1);
+			i--;
+		}
+	}
+	if(tileRows[0].type === 0) {//Adds new movables
+		addNewObstacles(0);
+	}
+	
+}
+
+function drawMovables() {//Moves the movables and draws them
+	for (var i=0; i<movables.length; i++) {
+        movables[i].move();
+        if (movables[i].outOfBounds()) {
+            if(movables[i].speed < 0) {
+            	movables[i].xCoord = GRID_WIDTH * TILE_WIDTH;
+            }
+            else {
+            	movables[i].xCoord = 0 - TILE_WIDTH;
+            }
+        }
+        movables[i].draw();
+    }
+}
+function drawObstacles() {//Draws them obstacles
+	for (var i=0; i<obstacles.length; i++) {
+        obstacles[i].draw();
+    }
+}
+
+function addNewMovables(type, row) {//Adds new row of movables
+	var rand = Math.floor(Math.random()*3);//This returns 0, 1, or 2 in equal proportions
+	var speed = Math.random()*6 - 3;//Returns number from -3 to 3, should be pretty slow!!!!!
+	for(var xPos = rand; xPos<GRID_WIDTH; xPos+= rand) {
+		rand = 0;
+		if(type === 0) {//If ground type..
+			xPos+= Math.floor(Math.random()*5);
+			movables.push(new MedicalKit(xPos, row, 0));
+			rand = Math.floor(Math.random()*5);//This is to decrease the frequency of medical kit spawns
+		}
+		else if(type === 1) {//If road type..
+			movables.push(new Moped(xPos, row, speed));
+		}		
+		else {//If water type..
+			movables.push(new Boat(xPos, row, speed));
+		}	
+		rand += Math.floor((Math.random() * 3) + 2);//This returns 2, 3, or 4 in equal proportions
+	}
+}
+function addNewObstacles(row) {//Adds new row of obstacles
+	var rand = Math.floor(Math.random()*7);//This returns 0, 1, 2, 3, 4, 5, 6 in equal proportions
+	for(var xPos = rand; xPos<GRID_WIDTH; xPos+= rand) {
+		if(rand % 3 === 0)
+			obstacles.push(new Tree(xPos, row));
+		else if(rand % 3 === 1)
+			obstacles.push(new Building(xPos, row));	
+		else
+			obstacles.push(new Temple(xPos, row));//Should be the least common..NOT
+		rand = Math.floor(Math.random()*7) + 1;
+	}
+}
+function drawChar() {//Should be called constantly and check for collisions
+	var collided = movableCollision();
+	var drowned = waterCollision();
+	if(collided === 0) {
+		console.log("medicine bag collected");
+
+	}
+	else if(collided === 1) {
+		console.log("Moped Collision");
+		gameOver();
+	}
+	else if(collided !== -1) {
+		console.log("boat collision");
+		//character.();
+		character.speed = Math.abs(collided);
+		if(collided < 0) {
+			character.leftOnBoat();
+		}
+		else{
+			character.rightOnBoat();
+		}
+		character.draw();
 		
 	}
-
-}
-function moveObjects() {
-	for(var row = 0; row < grid.rows.length; row++) {
-		var tileRow = grid.rows[row];
-		var arrayOfObjects = tileRow.objects;
-		for(var col = 0; col < arrayOfObjects.length; col++) {
-			var object = arrayOfObjects[col];						
-
-			if(object.constructor == Moped || object.constructor == Boat) {		 						
 	
-				object.x += object.xMove; 
-				var newObject;
-				if(object.x < 0) {
-					object.x = GRID_WIDTH - 1;
-
-				} 
-				else if(object.x > GRID_WIDTH*TILE_WIDTH) {
-					object.x = 0;
-				}
-
-			}	 		
-		}
-	}	
-
+	else {
+		if(drowned == true) {
+			console.log("drowned");
+			gameOver();
+		}	
+		character.draw();
+	}
 }
 
-function drawObjects() {
-	
-	drawTiles();//Maybe this will work
-	for(var row = 0; row < grid.rows.length; row++) {
-		var tileRow = grid.rows[row];
-		var arrayOfObjects = tileRow.objects;
-		for(var col = 0; col < arrayOfObjects.length; col++) {
-			var object = arrayOfObjects[col];						
-			var image = queue.getResult(object.imageSource);
-	    	var bitmap = new createjs.Bitmap(image);	         	
-	        stage.addChild(bitmap);
-	        bitmap.x = object.x * TILE_WIDTH;
-	        bitmap.y = object.y * TILE_WIDTH;  
-			stage.update();	    		
-		}
-	}	
+function collides(x1, y1, w1, h1, x2, y2, w2, h2) {   //Some beautiful collision detection, box-style, copied from elsewhere
+    var isCollision = (((x1 <= x2+w2 && x1 >=x2) && (y1 <= y2+h2 && y1 >= y2)) ||
+            ((x1+w1 <= x2+w2 && x1+w1 >= x2) && (y1 <= y2+h2 && y1 >= y2)) ||
+            ((x1 <= x2+w2 && x1 >=x2) && (y1+h1 <= y2+h2 && y1+h1 >= y2)) ||
+            ((x1+w1 <= x2+w2 && x1+w1 >= x2) && (y1+h1 <= y2+h2 && y1+h1 >= y2)));
+    return isCollision;
 }
 
-function drawChar(){
-	var image = queue.getResult(character.imgB);
-	var bitmap = new createjs.Bitmap(image);	         	
-	stage.addChild(bitmap);
-	bitmap.x = character.x * TILE_WIDTH;
-	bitmap.y = character.y * TILE_WIDTH;  
-	stage.update();	    		
+function movableCollision() { //return -1 for no collision, 0 for medicine bag collision, 1 for moped collision, and the boat's speed for boat collision
+    for (var i=0; i<movables.length; i++) {
+        if (collides(character.xCoordAct, character.yCoord, character.width, TILE_WIDTH, movables[i].xCoord, movables[i].yCoord, TILE_WIDTH-2, TILE_WIDTH-2)) {//shrank tiles a bit to fix error
+        	var type = movables[i].type;
+        	if (type === 0) {
+        		movables.splice(i, 1);
+        		i--;
+        	}
+        	else if (type === 2) {
+        		type = movables[i].speed;
+        	}
+        	return type;
+        }
+    }
+    
+    return -1;
 }
-
-
-
-//grid.shiftDown();
-console.log(grid);
-
-
-var gameOver = false;
-
-
-
-
-
+function waterCollision() { //returns true or false
+    for (var i=0; i<tileRows.length; i++) {
+        if (tileRows[i].type === 2 && collides(character.xCoordAct, character.yCoord, character.width, TILE_WIDTH, 0, 
+        	tileRows[i].row * TILE_WIDTH, TILE_WIDTH * GRID_WIDTH-2, TILE_WIDTH-2)) {  //Could write another collision function for this
+        	return true;
+        }
+    }
+    
+    return false;
+}
+function obstacleCollision(potX, potY) { //returns true or false
+    for (var i=0; i<obstacles.length; i++) {
+        if (collides(potX, potY, character.width, TILE_WIDTH, obstacles[i].xCoordAct, obstacles[i].y * TILE_WIDTH, TILE_WIDTH-1, TILE_WIDTH-1)) {
+        	return true;
+        }
+    }
+    
+    return false;
+}
 
 
 function printKey(e){
-
-	if (gameOver == false) {
-
-
-		if(e.keyCode === 65){
-			if (character.x > 0 && tileAvailable(character.x-1,character.y)) {
-		  		character.x-=1;
-			}
-			else {
-				console.log("game over");
-				gameOver = true;
-			}
-
-		}
-
-		if(e.keyCode === 87){
-		  if (tileAvailable(character.x,character.y-1)) {
-		  	grid.shiftDown();			
-		  }
-		  else {
-		  	console.log("game over");
-		  	gameOver = true;
-		  }
-		  
-		}
-
-		if(e.keyCode === 68){
-			if (character.x < GRID_WIDTH - 1 && tileAvailable(character.x+1,character.y)) {
-		  		character.x+=1;
-			}
-			else {
-				console.log("game over");
-				gameOver = true;
-			}
-		}
+	//console.log(e.keyCode);
+	if (e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) {
+            e.preventDefault();
+        }
+        if (game.inProgress == true) {
+            if (e.keyCode == 38 && obstacleCollision(character.xCoordAct,character.yCoord - TILE_WIDTH) == false){ 
+                character.up();
+                game.shiftGame();
+            } 
+            else if (e.keyCode == 40 && obstacleCollision(character.xCoordAct,character.yCoord + TILE_WIDTH) == false){
+                character.down();
+            } else if (e.keyCode == 37 && obstacleCollision(character.xCoordAct - TILE_WIDTH,character.yCoord) == false){
+                character.left();
+            } else if (e.keyCode == 39 && obstacleCollision(character.xCoordAct + TILE_WIDTH,character.yCoord) == false){
+                character.right();
+            } 
+            character.draw();
+        }
 	
-	}
-	if(gameOver) {
-		doGameOver();
-	}
-	drawTiles();
-	drawChar();
-
 }	
-
-
-function doGameOver() {
-	
+function gameOver() {
+	createjs.Ticker.reset();
+	game.inProgress = false;
 }
+
+
+
+
+
+
+
+
+
+
+
+
