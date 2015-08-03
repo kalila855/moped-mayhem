@@ -97,3 +97,11 @@ h3{
 #block{
 	 background-color: rgba(0,0,0.5);
 }
+
+#info{
+	position: absolute;
+ 	left: 16%;
+    width: 200px;
+    height: 100px;
+    border: 3px solid #8AC007;
+}
