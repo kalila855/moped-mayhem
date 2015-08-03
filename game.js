@@ -102,7 +102,7 @@ function Character (xPos, yPos, onBoat, imgB, imgF, imgR, imgL){ //Represents ou
 
 
 //Constructor for Movable Class
-function Movable(xPos,yPos,speed,type,img) {	//Type: 0 for medicine bad, 1 for moped and 2 for boat
+function Movable(xPos,yPos,speed,type,img) {	//Type: 0 for medicine bag, 1 for moped and 2 for boat
 	this.x = xPos;
 	this.y = yPos;
 	this.xCoord = this.x * TILE_WIDTH;//x Coordinate, used for moving
@@ -205,6 +205,16 @@ function Game(numMoved) {
 		shiftMovables();
 		shiftObstacles();
 		this.score ++;
+	}
+	this.reset = function() {
+		makeTileRows();	
+		drawTileRow();
+		makeMovablesAndObstacles();		
+		
+		character.x = GRID_WIDTH/2;
+		character.xCoord = character.x*TILE_WIDTH;
+		character.xCoordAct = character.xCoord + 14;
+		createjs.Ticker.addEventListener("tick", handleTick);
 	}
 }
 
@@ -548,8 +558,13 @@ function printKey(e){
 	
 }	
 function gameOver() {
-	createjs.Ticker.reset();
+	createjs.Ticker.off("tick", handleTick);
 	game.inProgress = false;
+
+	game.reset();
+
+	game.inProgress = true;
+
 }
 
 
