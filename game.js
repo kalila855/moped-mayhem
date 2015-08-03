@@ -45,9 +45,10 @@ function Character (xPos, yPos, onBoat, imgB, imgF, imgR, imgL){ //Represents ou
 	this.speed = CHAR_SPEED;//Onlys used when character is on a boat
 	this.onBoat = onBoat;
 	var imageB = queue.getResult(imgB);
-//	var imageF = queue.getResult(imgF);
-//	var imageR = queue.getResult(imgR);
-//	var imageL = queue.getResult(imgL);
+	var imageF = queue.getResult(imgF);
+	var imageR = queue.getResult(imgR);
+	var imageL = queue.getResult(imgL);
+	this.currentImage = imageB;
 //	var bitmapB = new createjs.Bitmap(imageB);
 //	var bitmapF = new createjs.Bitmap(imageF);
 //	var bitmapR = new createjs.Bitmap(imageR);
@@ -60,33 +61,33 @@ function Character (xPos, yPos, onBoat, imgB, imgF, imgR, imgL){ //Represents ou
 //	stage.addChild(bitmapL);
 
 	this.draw = function() {
-		context.drawImage(imageB,this.xCoord ,this.yCoord);	
+		context.drawImage(this.currentImage,this.xCoord ,this.yCoord);	
 	}
 	this.up = function() {
-    	//this.y -= 1;
+    	this.currentImage = imageB;
     }
     this.down = function() {
-    	
+    	this.currentImage = imageF;
     }
     this.left = function() {
-    	//this.x -= 1;
     	this.xCoord -= TILE_WIDTH;
     	this.xCoordAct -= TILE_WIDTH;
+    	this.currentImage = imageL;
     }
     this.right = function() {
-    	//this.x += 1;
     	this.xCoord += TILE_WIDTH;
     	this.xCoordAct += TILE_WIDTH;
+    	this.currentImage = imageR;
     }
     this.leftOnBoat = function() {
-    	//this.x -= 1;
     	this.xCoord -= this.speed;
     	this.xCoordAct -= this.speed;
+    	//this.currentImage = imageL;
     }
     this.rightOnBoat = function() {
-    	//this.x += 1;
     	this.xCoord += this.speed;
     	this.xCoordAct += this.speed;
+    	//this.currentImage = imageR;
     }
 }
 
@@ -347,7 +348,14 @@ function drawObstacles() {//Draws them obstacles
 
 function addNewMovables(type, row) {//Adds new row of movables
 	var rand = Math.floor(Math.random()*3);//This returns 0, 1, or 2 in equal proportions
-	var speed = Math.random()*6 - 3;//Returns number from -3 to 3, should be pretty slow!!!!!
+	var speed = Math.random()*10 - 5;//Returns number from -5 to 5, should be pretty slow!!!!!
+	if(speed <= 2 && speed > 0) {
+		console.log(Math.abs(speed));
+		speed += (Math.random()*2 + 2);//Generates from 2 to 4
+	}
+	else if(speed >= -2 && speed < 0) {
+		speed -= (Math.random()*2 + 2);//Generates from 2 to 4
+	}
 	for(var xPos = rand; xPos<GRID_WIDTH; xPos+= rand) {
 		rand = 0;
 		if(type === 0) {//If ground type..
@@ -361,7 +369,7 @@ function addNewMovables(type, row) {//Adds new row of movables
 		else {//If water type..
 			movables.push(new Boat(xPos, row, speed));
 		}	
-		rand += Math.floor((Math.random() * 3) + 2);//This returns 2, 3, or 4 in equal proportions
+		rand += Math.floor((Math.random() * 3) + 3);//This returns 2, 3, or 4 in equal proportions
 	}
 }
 function addNewObstacles(row) {//Adds new row of obstacles
@@ -452,16 +460,15 @@ function waterCollision() { //returns true or false
     
     return false;
 }
-function obstacleCollision(potX, potY) { //returns true or false
+function obstacleCollision(potX, potY) { //returns -1 for no collision, 0 for potential collision with obstacle, and 1 for collision with boundary
     for (var i=0; i<obstacles.length; i++) {
-        if (collides(potX, potY, character.width, TILE_WIDTH, obstacles[i].xCoordAct, obstacles[i].y * TILE_WIDTH, TILE_WIDTH-1, TILE_WIDTH-1)) {
-        	return true;
-        }
+        if (collides(potX, potY, character.width, TILE_WIDTH, obstacles[i].xCoordAct, obstacles[i].y * TILE_WIDTH, TILE_WIDTH-1, TILE_WIDTH-1)) 
+        	return 0;
     }
     if(potX < 0 || potX + character.width > TILE_WIDTH * GRID_WIDTH) 
-        return true;
+        return 1;
     
-    return false;
+    return -1;
 }
 function isOutOfBounds() {
 	if(character.xCoordAct < 0 || character.xCoordAct + character.width > TILE_WIDTH * GRID_WIDTH) 
@@ -470,7 +477,6 @@ function isOutOfBounds() {
 }
 
 function drawScores() {
-	console.log("drawing score");
     context.font = "bold 10pt arial";
     context.fillStyle = "#FF33CC";
     context.fillText("Score: ", 10, 20);  
@@ -487,21 +493,32 @@ function printKey(e){
             e.preventDefault();
         }
         if (game.inProgress == true) {
-            if (e.keyCode == 38 && obstacleCollision(character.xCoordAct,character.yCoord - TILE_WIDTH) == false){ 
+            if (e.keyCode == 38 && obstacleCollision(character.xCoordAct,character.yCoord - TILE_WIDTH) === -1){ //-1 is no collision, 0 is obstacle collision, 1 is boundary collision
                 character.up();
                 game.shiftGame();
             } 
-            else if (e.keyCode == 40 && obstacleCollision(character.xCoordAct,character.yCoord + TILE_WIDTH) == false){
+            else if (e.keyCode == 40 && obstacleCollision(character.xCoordAct,character.yCoord + TILE_WIDTH) === -1){
                 character.down();
-            } else if (e.keyCode == 37 && obstacleCollision(character.xCoordAct - TILE_WIDTH,character.yCoord) == false){
+            } 
+            else if (e.keyCode == 37 && obstacleCollision(character.xCoordAct - TILE_WIDTH,character.yCoord) !== 0){
                 if(character.onBoat == true) 
                 	character.leftOnBoat();
+                else if (obstacleCollision(character.xCoordAct - TILE_WIDTH,character.yCoord) === 1) {
+					character.xCoord = 0;
+					character.xCoordAct = 14;
+				}
                 else 
                 	character.left();
 
-            } else if (e.keyCode == 39 && obstacleCollision(character.xCoordAct + TILE_WIDTH,character.yCoord) == false){
+
+            } 
+            else if (e.keyCode == 39 && obstacleCollision(character.xCoordAct + TILE_WIDTH,character.yCoord) !== 0){
                 if(character.onBoat == true) 
                 	character.rightOnBoat();
+                else if (obstacleCollision(character.xCoordAct + TILE_WIDTH,character.yCoord) === 1) {
+					character.xCoord = GRID_WIDTH*TILE_WIDTH - TILE_WIDTH;
+					character.xCoordAct = character.xCoord + 14;
+				}
                 else 
                 	character.right();
             } 
