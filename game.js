@@ -48,7 +48,7 @@ function Character (xPos, yPos, onBoat, imgB, imgF, imgR, imgL){ //Represents ou
 	var imageF = queue.getResult(imgF);
 	var imageR = queue.getResult(imgR);
 	var imageL = queue.getResult(imgL);
-	this.currentImage = imageB;
+	this.currentImage = imageF;
 //	var bitmapB = new createjs.Bitmap(imageB);
 //	var bitmapF = new createjs.Bitmap(imageF);
 //	var bitmapR = new createjs.Bitmap(imageR);
@@ -59,12 +59,23 @@ function Character (xPos, yPos, onBoat, imgB, imgF, imgR, imgL){ //Represents ou
 //	stage.addChild(bitmapF);
 //	stage.addChild(bitmapR);
 //	stage.addChild(bitmapL);
+	this.switchImage = function(letter) {
+		if(letter === 'R') {
+			this.currentImage = imageR;
+		}
+		else if(letter === 'L') {
+			this.currentImage = imageL;
+		}
+		else if(letter === 'B') {
+			this.currentImage = imageB;
+		}
+	}
 
 	this.draw = function() {
 		context.drawImage(this.currentImage,this.xCoord ,this.yCoord);	
 	}
 	this.up = function() {
-		if (this.y < 7) {
+		if (this.y < 7) {//MOVE TO KEY INPUT IF POSSIBLE
             game.shiftGame();
         }
         else {    	
@@ -526,35 +537,53 @@ function printKey(e){
             e.preventDefault();
         }
         if (game.inProgress == true) {
-            if (e.keyCode == 38 && obstacleCollision(character.xCoordAct,character.yCoord - TILE_WIDTH) === -1){ //-1 is no collision, 0 is obstacle collision, 1 is boundary collision
+            if (e.keyCode == 38 && obstacleCollision(character.xCoordAct,character.yCoord - TILE_WIDTH) === -1){ //-1 is no collision, 
+            	//0 is obstacle collision, 1 is boundary collision
                 character.up();
 
             } 
             else if (e.keyCode == 40 && obstacleCollision(character.xCoordAct,character.yCoord + TILE_WIDTH) === -1){
+                character.switchImage('F');
                 if (character.y < GRID_HEIGHT - 1) {
                 	character.down();
                 }
             } 
-            else if (e.keyCode == 37 && obstacleCollision(character.xCoordAct - TILE_WIDTH,character.yCoord) !== 0){
+            else if (e.keyCode == 37){
+            	character.switchImage('L');
+            	var potCollision = obstacleCollision(character.xCoordAct - TILE_WIDTH,character.yCoord);
                 if(character.onBoat == true) 
                 	character.leftOnBoat();
-                else if (obstacleCollision(character.xCoordAct - TILE_WIDTH,character.yCoord) === 1) {
+                else if (potCollision === 1) {//Snap to edge
+          console.log("snap to edge");      	
 					character.xCoord = 0;
 					character.xCoordAct = 14;
 				}
-                else 
+				else if (potCollision === 0 && obstacleCollision(character.xCoordAct, character.yCoord) === -1) {//Snap to edge of obstac;e
+			console.log("snap to edge obstacle");  		
+					character.xCoord = Math.floor(character.xCoord / 50) * 50;
+					character.xCoordAct = character.xCoord + 14;
+				}
+                else if(potCollision === -1)//no collision
                 	character.left();
 
 
             } 
-            else if (e.keyCode == 39 && obstacleCollision(character.xCoordAct + TILE_WIDTH,character.yCoord) !== 0){
+            else if (e.keyCode == 39){
+            	character.switchImage('R');
+            	var potCollision = obstacleCollision(character.xCoordAct + TILE_WIDTH,character.yCoord);
                 if(character.onBoat == true) 
                 	character.rightOnBoat();
-                else if (obstacleCollision(character.xCoordAct + TILE_WIDTH,character.yCoord) === 1) {
+                else if (potCollision === 1) {//Snap to edge
+          console.log("snap to edge");
 					character.xCoord = GRID_WIDTH*TILE_WIDTH - TILE_WIDTH;
 					character.xCoordAct = character.xCoord + 14;
 				}
-                else 
+				else if (potCollision === 0 && obstacleCollision(character.xCoordAct, character.yCoord) === -1) {//Snap to edge of boundary
+		console.log("snap to edge obstacle");  			
+					character.xCoord = Math.ceil(character.xCoord / 50) * 50;
+					character.xCoordAct = character.xCoord + 14;
+				}
+                else if(potCollision === -1)//no collision
                 	character.right();
             } 
             character.draw();

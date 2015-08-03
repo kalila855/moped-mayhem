@@ -96,3 +96,16 @@ function drawBitmap()
         }   
         //create river
     }
+
+$(document).ready(function() {
+    $(document).scroll(function(){
+        if($(this).scrollTop() > 700)
+        {   
+            $('#info').css({"position":"relative"});
+        }
+        else {
+            $('#info').css({"position":"absolute"});
+        }
+    });
+}    
+
