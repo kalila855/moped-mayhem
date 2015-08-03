@@ -19,7 +19,7 @@
 		    width:55%;
 		    float:center;
 		    padding:10px;
-		    background-color: rgba(0,0,0.5);	 	 
+		   	 	 
 		}
 
 		#footer {
@@ -38,8 +38,11 @@
 		body {
 			font-family: 'Roboto Slab', serif;
 			background-image: url("background.jpg");
-			background-size: 2400px 1400px;
+			background-size: 100%;
+			background-attachment: fixed;
+
 		}
+
 	</style>
 
 	<link rel="stylesheet" type="text/css" href="StyleWebPage.css">
@@ -59,16 +62,17 @@
 
 	<div id="header">
 	<h1 style="margin-bottom:0;"><big>Moped Mayhem<img src="testImages/nurse-f.png"></big></h1>
-	<h2><big>Aid to Cambodia</big></h2>
+	<h2><big>Trouble in Cambodia</big></h2>
 	</div>
 
 
-	<center><h4>Game Instructions: W for up, A for left, D for right. To complete each level, collect as many medicine bags as possible and reach the hospital.</h4></center>
+	<center><h4>Game Instructions: Use arrow keys to move. To complete each level, collect as many medicine bags as possible and reach the hospital.</h4></center>
 
 
   	
   	<center><canvas id="demoCanvas" width="500" height="550" class= "center"></canvas></center>
-	
+
+<div id="block">	
 <center>
 
 	<div id="section">
@@ -88,7 +92,7 @@
 
 	</div>
 </center>
-
+</div>
 
 
 
