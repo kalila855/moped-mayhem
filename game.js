@@ -11,7 +11,7 @@ function loadImages() {//Preloads the images
 		"testImages/medical-kit.png", "testImages/boat.png", "testImages/tree.png", 
 		"testImages/mopeds.png", "testImages/nurse-f.png", 
 		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png",
-		"testImages/temple.png","testImages/house.png","testImages/moped2.png"]);
+		"testImages/temple.png","testImages/house.png","testImages/moped2.png", "testImages/back.jpg"]);
 }
 
 function TileRow (type,row,img) {// Represents a row object. Type is 0 for ground, 1 for road and 2 for water
@@ -200,13 +200,15 @@ function Game(numMoved) {
 }
 
 
-var game, context, stage, container, tileRows, obstacles, movables, character;//These will be initialized
+var game, context, scoreContext, stage, container, tileRows, obstacles, movables, character;//These will be initialized
 
 
 function startGame() {
 	
 	board = document.getElementById("demoCanvas");
-    context=board.getContext("2d");
+	scoreBoard = document.getElementById("info");
+    context = board.getContext("2d");
+    scoreContext = scoreBoard.getContext("2d");
     container = new createjs.Container();//DELETE
  	
  	game = new Game(0);
@@ -259,6 +261,7 @@ function shiftTileRow() {
 		tileRows[i].shiftDown();	
 	}
 	console.log(tileRows);	
+
 	//game.numMoved++;	
 }
 
@@ -477,15 +480,18 @@ function isOutOfBounds() {
 }
 
 function drawScores() {
-    context.font = "bold 10pt arial";
-    context.fillStyle = "#FF33CC";
-    context.fillText("Score: ", 10, 20);  
-    context.fillText(game.score, 55, 20);
-    context.fillText(game.numKits, 350, 20);  
-    if(game.numKits == 1)
-    	context.fillText(" medical kit collected", 360, 20);
-    else
-    	context.fillText(" medical kits collected", 360, 20);
+    var image = queue.getResult("testImages/back.jpg")  
+	scoreContext.drawImage(image,0,0);
+    scoreContext.font = "bold 20pt arial";
+    scoreContext.fillStyle = "#FF33CC";
+    scoreContext.fillText("Score: ", 5, 30); 
+
+    scoreContext.fillText(game.score, 90, 30);
+    // scoreContext.fillText(game.numKits, 350, 20);  
+    // if(game.numKits == 1)
+    // 	scoreContext.fillText(" medical kit collected", 360, 20);
+    // else
+    // 	scoreContext.fillText(" medical kits collected", 360, 20);
 }
 
 function printKey(e){

@@ -99,9 +99,15 @@ h3{
 }
 
 #info{
-	position: absolute;
- 	left: 16%;
-    width: 200px;
-    height: 100px;
-    border: 3px solid #8AC007;
+/*	position: abso;
+	float: left;*/
+ /*	left: 16%;   HARD CODED*/
+  
+  border: 3px solid #8AC007;
+  /*background: black;*/
+  position: fixed;
+  left: 30%;
+
+  margin-left: -300px; /*half the width*/
+
 }
