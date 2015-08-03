@@ -11,7 +11,7 @@ function loadImages() {//Preloads the images
 		"testImages/medical-kit.png", "testImages/boat.png", "testImages/tree.png", 
 		"testImages/mopeds.png", "testImages/nurse-f.png", 
 		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png",
-		"testImages/temple.png","testImages/house.png","testImages/moped2.png"]);
+		"testImages/temple.png","testImages/house.png","testImages/moped2.png", "testImages/back.jpg"]);
 }
 
 function TileRow (type,row,img) {// Represents a row object. Type is 0 for ground, 1 for road and 2 for water
@@ -64,9 +64,18 @@ function Character (xPos, yPos, onBoat, imgB, imgF, imgR, imgL){ //Represents ou
 		context.drawImage(this.currentImage,this.xCoord ,this.yCoord);	
 	}
 	this.up = function() {
+		if (this.y < 7) {
+            game.shiftGame();
+        }
+        else {    	
+          	this.y -= 1;
+            this.yCoord = this.y * TILE_WIDTH;
+        }	
     	this.currentImage = imageB;
     }
     this.down = function() {
+    	this.y += 1;
+        this.yCoord = this.y * TILE_WIDTH;
     	this.currentImage = imageF;
     }
     this.left = function() {
@@ -210,13 +219,15 @@ function Game(numMoved) {
 }
 
 
-var game, context, stage, container, tileRows, obstacles, movables, character;//These will be initialized
+var game, context, scoreContext, stage, container, tileRows, obstacles, movables, character;//These will be initialized
 
 
 function startGame() {
 	
 	board = document.getElementById("demoCanvas");
-    context=board.getContext("2d");
+	scoreBoard = document.getElementById("info");
+    context = board.getContext("2d");
+    scoreContext = scoreBoard.getContext("2d");
     container = new createjs.Container();//DELETE
  	
  	game = new Game(0);
@@ -269,6 +280,7 @@ function shiftTileRow() {
 		tileRows[i].shiftDown();	
 	}
 	console.log(tileRows);	
+
 	//game.numMoved++;	
 }
 
@@ -436,6 +448,9 @@ function drawChar() {//Should be called constantly and check for collisions
 }
 
 function collides(x1, y1, w1, h1, x2, y2, w2, h2) {   //Some beautiful collision detection, box-style, copied from elsewhere
+    y1 +=20;
+    h1 -=40;
+    h2 -=20;
     var isCollision = (((x1 <= x2+w2 && x1 >=x2) && (y1 <= y2+h2 && y1 >= y2)) ||
             ((x1+w1 <= x2+w2 && x1+w1 >= x2) && (y1 <= y2+h2 && y1 >= y2)) ||
             ((x1 <= x2+w2 && x1 >=x2) && (y1+h1 <= y2+h2 && y1+h1 >= y2)) ||
@@ -445,8 +460,9 @@ function collides(x1, y1, w1, h1, x2, y2, w2, h2) {   //Some beautiful collision
 
 function movableCollision() { //return -1 for no collision, 0 for medicine bag collision, 1 for moped collision, and the boat's speed for boat collision
     for (var i=0; i<movables.length; i++) {
-        if (collides(character.xCoordAct, character.yCoord, character.width, TILE_WIDTH, movables[i].xCoord, movables[i].yCoord, TILE_WIDTH-2, TILE_WIDTH-2)) {//shrank tiles a bit to fix error
+        if (collides(character.xCoordAct, character.yCoord, character.width, TILE_WIDTH, movables[i].xCoord, movables[i].yCoord, TILE_WIDTH-1, TILE_WIDTH-1)) {//shrank tiles a bit to fix error
         	var type = movables[i].type;
+        	console.log(movables[i]);
         	if (type === 0) {
         		movables.splice(i, 1);
         		i--;
@@ -472,7 +488,7 @@ function waterCollision() { //returns true or false
 }
 function obstacleCollision(potX, potY) { //returns -1 for no collision, 0 for potential collision with obstacle, and 1 for collision with boundary
     for (var i=0; i<obstacles.length; i++) {
-        if (collides(potX, potY, character.width, TILE_WIDTH, obstacles[i].xCoordAct, obstacles[i].y * TILE_WIDTH, TILE_WIDTH-1, TILE_WIDTH-1)) 
+        if (collides(potX, potY, character.width, TILE_WIDTH, obstacles[i].xCoordAct, obstacles[i].y * TILE_WIDTH, TILE_WIDTH-2, TILE_WIDTH-2)) 
         	return 0;
     }
     if(potX < 0 || potX + character.width > TILE_WIDTH * GRID_WIDTH) 
@@ -487,15 +503,18 @@ function isOutOfBounds() {
 }
 
 function drawScores() {
-    context.font = "bold 10pt arial";
-    context.fillStyle = "#FF33CC";
-    context.fillText("Score: ", 10, 20);  
-    context.fillText(game.score, 55, 20);
-    context.fillText(game.numKits, 350, 20);  
-    if(game.numKits == 1)
-    	context.fillText(" medical kit collected", 360, 20);
-    else
-    	context.fillText(" medical kits collected", 360, 20);
+    var image = queue.getResult("testImages/back.jpg")  
+	scoreContext.drawImage(image,0,0);
+    scoreContext.font = "bold 20pt arial";
+    scoreContext.fillStyle = "#FF33CC";
+    scoreContext.fillText("Score: ", 5, 30); 
+
+    scoreContext.fillText(game.score, 90, 30);
+    // scoreContext.fillText(game.numKits, 350, 20);  
+    // if(game.numKits == 1)
+    // 	scoreContext.fillText(" medical kit collected", 360, 20);
+    // else
+    // 	scoreContext.fillText(" medical kits collected", 360, 20);
 }
 
 function printKey(e){
@@ -505,10 +524,12 @@ function printKey(e){
         if (game.inProgress == true) {
             if (e.keyCode == 38 && obstacleCollision(character.xCoordAct,character.yCoord - TILE_WIDTH) === -1){ //-1 is no collision, 0 is obstacle collision, 1 is boundary collision
                 character.up();
-                game.shiftGame();
+
             } 
             else if (e.keyCode == 40 && obstacleCollision(character.xCoordAct,character.yCoord + TILE_WIDTH) === -1){
-                character.down();
+                if (character.y < GRID_HEIGHT - 1) {
+                	character.down();
+                }
             } 
             else if (e.keyCode == 37 && obstacleCollision(character.xCoordAct - TILE_WIDTH,character.yCoord) !== 0){
                 if(character.onBoat == true) 
