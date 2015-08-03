@@ -210,10 +210,14 @@ function Game(numMoved) {
 		makeTileRows();	
 		drawTileRow();
 		makeMovablesAndObstacles();		
+		game.score = 0;//CHANGE IF LEVELS ADDED
+		game.numKits = 0;
 		
 		character.x = GRID_WIDTH/2;
 		character.xCoord = character.x*TILE_WIDTH;
 		character.xCoordAct = character.xCoord + 14;
+		character.y = GRID_HEIGHT-1;
+		character.yCoord = character.y*TILE_WIDTH;
 		createjs.Ticker.addEventListener("tick", handleTick);
 	}
 }
