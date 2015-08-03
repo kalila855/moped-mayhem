@@ -498,13 +498,13 @@ function drawScores() {
     scoreContext.font = "bold 20pt arial";
     scoreContext.fillStyle = "#FF33CC";
     scoreContext.fillText("Score: ", 5, 30); 
-
     scoreContext.fillText(game.score, 90, 30);
-    // scoreContext.fillText(game.numKits, 350, 20);  
-    // if(game.numKits == 1)
-    // 	scoreContext.fillText(" medical kit collected", 360, 20);
-    // else
-    // 	scoreContext.fillText(" medical kits collected", 360, 20);
+
+    scoreContext.fillText(game.numKits, 170, 70);  
+    if(game.numKits == 1)
+    	scoreContext.fillText("Medical kit:", 5, 70);
+    else
+    	scoreContext.fillText("Medical kits:", 5, 70);
 }
 
 function printKey(e){
