@@ -606,7 +606,7 @@ function drawScores() {
     var image = queue.getResult("testImages/back.jpg")  
 	scoreContext.drawImage(image,0,0);
     scoreContext.font = "bold 14pt arial";
-    scoreContext.fillStyle = "#FF33CC";
+    scoreContext.fillStyle = "white";
     scoreContext.fillText("Score: ", 5, 30); 
     scoreContext.fillText(game.score, 77, 30);
 
