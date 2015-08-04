@@ -1,0 +1,17 @@
+#head{
+	font-family: 'Roboto Slab', serif;
+}
+
+#text{
+	font-family: 'Roboto Slab', serif;
+	background-color: rgba(157, 243, 57, 1);
+	margin-left: 100px;
+	margin-bottom: 2px;
+	margin-right: 100px;
+	margin-top: 2px;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-top: 8px ;
+	padding-bottom: 8px;
+
+}
