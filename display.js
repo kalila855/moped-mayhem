@@ -99,8 +99,7 @@ function drawBitmap()
 
 $(document).ready(function() {
     $(document).scroll(function(){
-        if($(this).scrollTop() > 700)
-        {   
+        if($(this).scrollTop() > 700) {   
             $('#info').css({"position":"relative"});
         }
         else {
