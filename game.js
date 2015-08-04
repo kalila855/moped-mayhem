@@ -4,6 +4,7 @@ var GRID_HEIGHT = 11;
 var TILE_WIDTH = 50; //Tiles are 50x50 pixels
 var CHAR_SPEED = 10;
 var POINT_GOAL = 10;//CHANGE THIS..
+var CHARACTER_WIDTH = 22;
 
 function loadImages() {//Preloads the images
 	queue = new createjs.LoadQueue(false);//true loads file as XHR, whatever that means
@@ -46,7 +47,7 @@ function Character (xPos, yPos, onBoat){ //Represents our beautiful character
 	this.xCoord = this.x * TILE_WIDTH;
 	this.xCoordAct = this.x * TILE_WIDTH + 14;//The x coordinate of the actual image
 	this.yCoord = this.y * TILE_WIDTH;//Should currently be 100;
-	this.width = 22;
+	this.width = CHARACTER_WIDTH;
 	this.speed = CHAR_SPEED;//Onlys used when character is on a boat
 	this.onBoat = onBoat;
 	var imageB = queue.getResult("testImages/nurse-b.png");
@@ -237,7 +238,18 @@ function Boat (x,y,speed) {
 
 //Medical Kit constructor
 function MedicalKit(x,y) {
-	Movable.call(this,x,y,0,0,"testImages/medical-kit.png");
+	var rand = Math.floor(Math.random(3)); //0, 1, or 2
+	var image;
+	if( rand === 0) {
+		image = "testImages/medical-kit.png";
+	}
+	else if(rand === 1) {
+		image = "testImages/bandaid.png";
+	}
+	else {
+		image = "testImages/shot.png";
+	}
+	Movable.call(this,x,y,0,0,image);
 }
 
 //Building constructor
@@ -314,8 +326,14 @@ function startGame() {
 	drawTileRow();
 	makeMovablesAndObstacles();
 	setOffTicker();
-	character = new Character(GRID_WIDTH/2,GRID_HEIGHT-1,false);
+	for(var i = 0; i<GRID_WIDTH; i++) {
+		if (obstacleCollision(i*TILE_WIDTH, GRID_HEIGHT * TILE_WIDTH - TILE_WIDTH) === -1 ) {
+			console.log("spawn at " + i);
+			character = new Character(i,GRID_HEIGHT-1,false);
+			break;
+		}
 		
+	}	
 
 }
 
@@ -567,11 +585,11 @@ function waterCollision() { //returns true or false
 }
 function obstacleCollision(potX, potY) { //returns -1 for no collision, 0 for potential collision with obstacle, and 1 for collision with boundary
     for (var i=0; i<obstacles.length; i++) {
-        if (collides(potX, potY, character.width, TILE_WIDTH, obstacles[i].xCoordAct, obstacles[i].y * TILE_WIDTH, obstacles[i].width, TILE_WIDTH-2)) 
+        if (collides(potX, potY, CHARACTER_WIDTH, TILE_WIDTH, obstacles[i].xCoordAct, obstacles[i].y * TILE_WIDTH, obstacles[i].width, TILE_WIDTH-2)) 
         	
         	return obstacles[i].xCoordAct;//RETURNS THE COORDINATE OF THE OBSTACLE CHARACTER IS HEADED FOR
     }
-    if(potX < 0 || potX + character.width > TILE_WIDTH * GRID_WIDTH) {   	
+    if(potX < 0 || potX + CHARACTER_WIDTH > TILE_WIDTH * GRID_WIDTH) {   	
         return 1;
     }
     return -1;
