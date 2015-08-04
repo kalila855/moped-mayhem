@@ -11,7 +11,10 @@ function loadImages() {//Preloads the images
 		"testImages/medical-kit.png", "testImages/bandaid.png", "testImages/shot.png", "testImages/boat.png", "testImages/tree.png", 
 		"testImages/mopeds.png", "testImages/nurse-f.png", 
 		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png",
-		"testImages/temple.png","testImages/house.png","testImages/moped2.png", "testImages/back.jpg", "testImages/right-run.png", "testImages/game-over.png", "testImages/button.png"]);
+
+		"testImages/temple.png","testImages/house.png","testImages/moped2.png", "testImages/back.jpg", "testImages/right-run.png",
+		"testImages/game-over.png"]);
+
 }
 
 function TileRow (type,row,img) {// Represents a row object. Type is 0 for ground, 1 for road and 2 for water
@@ -232,6 +235,7 @@ function Game(numMoved) {
 		this.score ++;
 	}
 	this.reset = function() {
+		game.inProgress = true;
 		makeTileRows();	
 		drawTileRow();
 		makeMovablesAndObstacles();		
@@ -624,13 +628,15 @@ function gameOver() {
 	createjs.Ticker.off("tick", handleTick);
 	
 	game.inProgress = false;
-	game.sleep(2000);//Wait 2 seconds until gameOver page is shown
-	game.reset();
-	game.inProgress = true;
+	game.sleep(500);//Wait 2 seconds until gameOver page is shown
+	var gameOver = queue.getResult("testImages/game-over.png");
+	context.drawImage(gameOver, 0, 0);
+
+	document.addEventListener("click", game.reset );
+	
+	
 
 }
-
-
 
 
 
