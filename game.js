@@ -547,16 +547,16 @@ function isOutOfBounds() {
 function drawScores() {
     var image = queue.getResult("testImages/back.jpg")  
 	scoreContext.drawImage(image,0,0);
-    scoreContext.font = "bold 16pt arial";
+    scoreContext.font = "bold 14pt arial";
     scoreContext.fillStyle = "#FF33CC";
     scoreContext.fillText("Score: ", 5, 30); 
-    scoreContext.fillText(game.score, 90, 30);
+    scoreContext.fillText(game.score, 77, 30);
 
-    scoreContext.fillText(game.numKits, 140, 60);  
+    scoreContext.fillText(game.numKits, 125, 50);  
     if(game.numKits == 1)
-    	scoreContext.fillText("Medical Kit:", 5, 60);
+    	scoreContext.fillText("Medical Kit:", 5, 50);
     else
-    	scoreContext.fillText("Medical Kits:", 5, 60);
+    	scoreContext.fillText("Medical Kits:", 5, 50);
 }
 
 function printKey(e){
