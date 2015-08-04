@@ -632,9 +632,7 @@ function gameOver() {
 	var gameOver = queue.getResult("testImages/game-over.png");
 	context.drawImage(gameOver, 0, 0);
 
-	document.addEventListener("click", game.reset );
-	
-	
+	document.addEventListener("click", game.reset);
 
 }
 
