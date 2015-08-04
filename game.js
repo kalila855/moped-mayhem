@@ -11,7 +11,7 @@ function loadImages() {//Preloads the images
 		"testImages/medical-kit.png", "testImages/boat.png", "testImages/tree.png", 
 		"testImages/mopeds.png", "testImages/nurse-f.png", 
 		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png",
-		"testImages/temple.png","testImages/house.png","testImages/moped2.png", "testImages/back.jpg"]);
+		"testImages/temple.png","testImages/house.png","testImages/moped2.png", "testImages/back.jpg", "testImages/right-run.png"]);
 }
 
 function TileRow (type,row,img) {// Represents a row object. Type is 0 for ground, 1 for road and 2 for water
@@ -35,7 +35,7 @@ function TileRow (type,row,img) {// Represents a row object. Type is 0 for groun
     }
 }
 
-function Character (xPos, yPos, onBoat, imgB, imgF, imgR, imgL){ //Represents our beautiful character
+function Character (xPos, yPos, onBoat){ //Represents our beautiful character
 	this.x = xPos;
 	this.y = yPos;
 	this.xCoord = this.x * TILE_WIDTH;
@@ -44,21 +44,30 @@ function Character (xPos, yPos, onBoat, imgB, imgF, imgR, imgL){ //Represents ou
 	this.width = 22;
 	this.speed = CHAR_SPEED;//Onlys used when character is on a boat
 	this.onBoat = onBoat;
-	var imageB = queue.getResult(imgB);
-	var imageF = queue.getResult(imgF);
-	var imageR = queue.getResult(imgR);
-	var imageL = queue.getResult(imgL);
+	var imageB = queue.getResult("testImages/nurse-b.png");
+	var imageF = queue.getResult("testImages/nurse-f.png");
+	var imageR = queue.getResult("testImages/nurse-r.png");
+	var imageL = queue.getResult("testImages/nurse-l.png");
+	// var rightAnimateSheet = queue.getResult("testImages/right-run.png");
 	this.currentImage = imageF;
-//	var bitmapB = new createjs.Bitmap(imageB);
-//	var bitmapF = new createjs.Bitmap(imageF);
-//	var bitmapR = new createjs.Bitmap(imageR);
-//	var bitmapL = new createjs.Bitmap(imageL);
-//	bitmapB.x = this.x * TILE_WIDTH;
-//	bitmapB.y = this.y * TILE_WIDTH;  
-//	stage.addChild(bitmapB);
-//	stage.addChild(bitmapF);
-//	stage.addChild(bitmapR);
-//	stage.addChild(bitmapL);
+	
+	// var data = {
+	//     images: [rightAnimateSheet],
+	//     frames: {width:50, height:50, count:9, regX: 0, regY:0, spacing:0, margin:0},
+	//     animations: {
+	//         jumpRight:[0, 8]
+	//     }
+	// };
+	// var spriteSheet = new createjs.SpriteSheet(data);
+	// var rightAnimation = new createjs.Sprite(spriteSheet, "jumpRight");
+	// var instance = new createjs.Sprite(rightAnimation);
+	// instance.x = this.xCoord;
+ //    instance.y = this.yCoord;
+ //    stage.addChild(instance);
+ //    createjs.Ticker.setFPS(10);
+ //    createjs.Ticker.addEventListener("tick", stage);
+
+   
 	this.switchImage = function(letter) {
 		if(letter === 'R') {
 			this.currentImage = imageR;
@@ -98,6 +107,10 @@ function Character (xPos, yPos, onBoat, imgB, imgF, imgR, imgL){ //Represents ou
     	this.xCoord += TILE_WIDTH;
     	this.xCoordAct += TILE_WIDTH;
     	this.currentImage = imageR;
+    	
+    	// instance.x = this.xCoord;
+    	// instance.y = this.yCoord;
+    	// instance.gotoAndStop("jumpRight");
     }
     this.leftOnBoat = function() {
     	this.xCoord -= this.speed;
@@ -264,8 +277,7 @@ function startGame() {
 	console.log(movables);	
 	console.log(obstacles);
 	setOffTicker();
-	character = new Character(GRID_WIDTH/2,GRID_HEIGHT-1,false, "testImages/nurse-b.png", "testImages/nurse-f.png",
-  	"testImages/nurse-r.png", "testImages/nurse-l.png");
+	character = new Character(GRID_WIDTH/2,GRID_HEIGHT-1,false);
 		
 
 }
