@@ -11,12 +11,10 @@ function loadImages() {//Preloads the images
 		"testImages/medical-kit.png", "testImages/bandaid.png", "testImages/shot.png", "testImages/boat.png", "testImages/tree.png", 
 		"testImages/mopeds.png", "testImages/nurse-f.png", 
 		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png",
-<<<<<<< HEAD
+
 		"testImages/temple.png","testImages/house.png","testImages/moped2.png", "testImages/back.jpg", "testImages/right-run.png",
 		"testImages/game-over.png"]);
-=======
-		"testImages/temple.png","testImages/house.png","testImages/moped2.png", "testImages/back.jpg", "testImages/right-run.png", "testImages/game-over.png", "testImages/button.png"]);
->>>>>>> 59868f8166073dd0f2e0bf4abbe4a67f7f9d1883
+
 }
 
 function TileRow (type,row,img) {// Represents a row object. Type is 0 for ground, 1 for road and 2 for water
