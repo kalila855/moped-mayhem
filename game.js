@@ -3,6 +3,7 @@ var GRID_WIDTH = 10;
 var GRID_HEIGHT = 11;
 var TILE_WIDTH = 50; //Tiles are 50x50 pixels
 var CHAR_SPEED = 10;
+var POINT_GOAL = 10;//CHANGE THIS..
 
 function loadImages() {//Preloads the images
 	queue = new createjs.LoadQueue(false);//true loads file as XHR, whatever that means
@@ -13,7 +14,8 @@ function loadImages() {//Preloads the images
 		"testImages/nurse-b.png", "testImages/nurse-r.png", "testImages/nurse-l.png",
 
 		"testImages/temple.png","testImages/house.png","testImages/moped2.png", "testImages/back.jpg", "testImages/right-run.png",
-		"testImages/game-over.png"]);
+		"testImages/game-over.png", "testImages/hospital-1.png", "testImages/hospital-2.png", "testImages/hospital-3.png", "testImages/hospital-4.png",
+		"testImages/game-won.png"]);
 
 }
 
@@ -87,7 +89,7 @@ function Character (xPos, yPos, onBoat){ //Represents our beautiful character
 		context.drawImage(this.currentImage,this.xCoord ,this.yCoord);	
 	}
 	this.up = function() {
-		if (this.y < 7) {//MOVE TO KEY INPUT IF POSSIBLE
+		if (this.y < 7 && game.scroll == true) {//MOVE TO KEY INPUT IF POSSIBLE
             game.shiftGame();
         }
         else {    	
@@ -187,8 +189,34 @@ function Road (row) {
 function River (row) {
 	TileRow.call(this,2,row,"testImages/water.png");
 }
+//Hospital constuctor
 
-
+function Hospital(row) {
+	var image;
+	if(game.hospitalImageNum === 1) {
+		console.log("hospital 1");
+		image = "testImages/hospital-1.png";
+		game.hospitalImageNum++;                   
+	}
+	else if(game.hospitalImageNum === 2) { 
+		console.log("hospital 2");
+		image = "testImages/hospital-2.png";
+		game.hospitalImageNum++;
+		console.log("image changed to " + image);
+	}  
+	else if(game.hospitalImageNum === 3) { 
+		console.log("hospital 3");
+		image = "testImages/hospital-3.png";
+		game.hospitalImageNum++;
+		console.log("image changed to " + image);
+	} 
+	else { 
+		console.log("hospital 4");
+		image = "testImages/hospital-4.png";
+		game.scroll = false;
+	} 
+	TileRow.call(this, -1, row, image);
+}
 
 //Moped constructor
 function Moped (x,y,speed) {
@@ -228,14 +256,22 @@ function Game(numMoved) {
 	this.score = numMoved;
 	this.numKits = 0;
 	this.inProgress = true;
+	this.scroll = true;
+	this.goalReached = false;
+	this.hospitalImageNum = 1;
 	this.shiftGame = function() {
 		shiftTileRow();
 		shiftMovables();
 		shiftObstacles();
-		this.score ++;
+		this.score++;
 	}
 	this.reset = function() {
+		document.removeEventListener("click", resetGame);
 		game.inProgress = true;
+		game.scroll = true;
+		game.goalReached = false;
+		game.hospitalImageNum = 1;
+
 		makeTileRows();	
 		drawTileRow();
 		makeMovablesAndObstacles();		
@@ -272,14 +308,11 @@ function startGame() {
  	
  	game = new Game(0);
  	stage = new createjs.Stage("demoCanvas");
+ 	//game.hospitalImageNum = 1;
  	
 	makeTileRows();
-	console.log(tileRows);	
 	drawTileRow();
-	console.log(tileRows);
 	makeMovablesAndObstacles();
-	console.log(movables);	
-	console.log(obstacles);
 	setOffTicker();
 	character = new Character(GRID_WIDTH/2,GRID_HEIGHT-1,false);
 		
@@ -332,7 +365,11 @@ function drawTileRow () {
 
 function getNewTileRow(row) {
 	var rand = Math.floor(Math.random()*3);//This returns 0, 1, or 2 in equal proportions
-	if(rand === 0) {
+	if(game.goalReached === true) {//Draws the hospiral
+console.log("Getting new hospital tile ");	 	
+	 	return new Hospital(row);
+	}
+	else if(rand === 0) {
 		return new Road(row);	
 	}
 	else if(rand === 1)  {
@@ -368,7 +405,7 @@ function shiftMovables() {
 	else if(tileRows[0].type === 1) {
 		addNewMovables(1, 0);		
 	}
-	else {//if(tileRows[0].type === 2) {
+	else if(tileRows[0].type === 2) {
 		addNewMovables(2, 0);
 	}
 
@@ -409,30 +446,31 @@ function drawObstacles() {//Draws them obstacles
 }
 
 function addNewMovables(type, row) {//Adds new row of movables
-	var rand = Math.floor(Math.random()*3);//This returns 0, 1, or 2 in equal proportions
-	var speed = Math.random()*10 - 5;//Returns number from -5 to 5, should be pretty slow!!!!!
-	if(speed <= 2 && speed > 0) {
-		console.log(Math.abs(speed));
-		speed += (Math.random()*2 + 2);//Generates from 2 to 4
-	}
-	else if(speed >= -2 && speed < 0) {
-		speed -= (Math.random()*2 + 2);//Generates from 2 to 4
-	}
-	for(var xPos = rand; xPos<GRID_WIDTH; xPos+= rand) {
-		rand = 0;
-		if(type === 0) {//If ground type..
-			xPos+= Math.floor(Math.random()*5);
-			movables.push(new MedicalKit(xPos, row, 0));
-			rand = Math.floor(Math.random()*5);//This is to decrease the frequency of medical kit spawns
+	if(game.goalReached == false) {
+		var rand = Math.floor(Math.random()*3);//This returns 0, 1, or 2 in equal proportions
+		var speed = Math.random()*10 - 5;//Returns number from -5 to 5, should be pretty slow!!!!!
+		if(speed <= 2 && speed > 0) {
+			speed += (Math.random()*2 + 2);//Generates from 2 to 4
 		}
-		else if(type === 1) {//If road type..
-			movables.push(new Moped(xPos, row, speed));
-		}		
-		else {//If water type..
-			movables.push(new Boat(xPos, row, speed));
-		}	
-		rand += Math.floor((Math.random() * 3) + 3);//This returns 2, 3, or 4 in equal proportions
-	}
+		else if(speed >= -2 && speed < 0) {
+			speed -= (Math.random()*2 + 2);//Generates from 2 to 4
+		}
+		for(var xPos = rand; xPos<GRID_WIDTH; xPos+= rand) {
+			rand = 0;
+			if(type === 0) {//If ground type..
+				xPos+= Math.floor(Math.random()*5);
+				movables.push(new MedicalKit(xPos, row, 0));
+				rand = Math.floor(Math.random()*5);//This is to decrease the frequency of medical kit spawns
+			}
+			else if(type === 1) {//If road type..
+				movables.push(new Moped(xPos, row, speed));
+			}		
+			else {//If water type..
+				movables.push(new Boat(xPos, row, speed));
+			}	
+			rand += Math.floor((Math.random() * 3) + 3);//This returns 2, 3, or 4 in equal proportions
+		}
+	}	
 }
 function addNewObstacles(row) {//Adds new row of obstacles
 	var rand = Math.floor(Math.random()*7);//This returns 0, 1, 2, 3, 4, 5, 6 in equal proportions
@@ -450,19 +488,22 @@ function drawChar() {//Should be called constantly and check for collisions
 	var collided = movableCollision();
 	var fellOffEdge = isOutOfBounds();
 	character.draw();
+	if(character.yCoord <= 150) {
+		gameWon();
+	}
 	if(collided === 0) {
-		console.log("medicine bag collected");
 		game.numKits++;
+		if(game.numKits >= POINT_GOAL) {
+			game.goalReached = true;      
+		}
 
 	}
 	else if(collided === 1) {
-		console.log("Moped Collision");
 		gameOver();
 	}
 	else if(collided !== -1) {
-		console.log("boat collision");
 		
-		character.onBoat = true;//DELETE
+		character.onBoat = true;
 		character.speed = Math.abs(collided);
 		if(fellOffEdge == true) {
 			gameOver();
@@ -480,7 +521,6 @@ function drawChar() {//Should be called constantly and check for collisions
 		character.onBoat = false;
 		var drowned = waterCollision();
 		if(drowned == true) {
-			console.log("drowned");
 			gameOver();
 		}	
 	}
@@ -581,16 +621,14 @@ function printKey(e){
             	var potCollision = obstacleCollision(character.xCoordAct - TILE_WIDTH,character.yCoord);
                 if(character.onBoat == true) 
                 	character.leftOnBoat();
-                else if (potCollision === 1) {//Snap to edge
-          console.log("snap to edge");      	
+                else if (potCollision === 1) {//Snap to edge    	
 					character.xCoord = 0;
 					character.xCoordAct = 14;
 				}
 				else if(potCollision === -1)//no collision
                 	character.left();
 
-				else {//if (potCollision === 0 ) {//Snap to edge of obstac;e
-			console.log("snap to edge obstacle on left");  		
+				else {//if (potCollision === 0 ) {//Snap to edge of obstac;e 		
 					character.xCoord = potCollision +TILE_WIDTH;
 					character.xCoordAct = character.xCoord + 14;
 				}
@@ -604,15 +642,13 @@ function printKey(e){
                 if(character.onBoat == true) 
                 	character.rightOnBoat();
                 else if (potCollision === 1) {//Snap to edge
-          console.log("snap to edge");
 					character.xCoord = GRID_WIDTH*TILE_WIDTH - TILE_WIDTH;
 					character.xCoordAct = character.xCoord + 14;
 				}
 				else if(potCollision === -1)//no potential collision
                 	character.right();
 				
-				else {//Snap to edge of boundary
-		console.log("snap to edge obstacle right potentialCollision = " + potCollision);  			
+				else {//Snap to edge of boundary			
 					character.xCoord = potCollision -TILE_WIDTH;
 					character.xCoordAct = character.xCoord + 14;
 				}
@@ -620,8 +656,7 @@ function printKey(e){
             } 
             character.draw();
         }
-        console.log("xCoord is " + character.xCoord + " xCoordAct is " + character.xCoordAct);
-	
+
 }	
 
 function gameOver() {
@@ -632,11 +667,26 @@ function gameOver() {
 	var gameOver = queue.getResult("testImages/game-over.png");
 	context.drawImage(gameOver, 0, 0);
 
-	document.addEventListener("click", game.reset);
+	document.addEventListener("click", resetGame);
+
+}
+function gameWon() {
+	createjs.Ticker.off("tick", handleTick);
+	
+	game.inProgress = false;
+	game.sleep(500);//Wait 2 seconds until gameWon page is shown
+	var gameOver = queue.getResult("testImages/game-won.png");
+	context.drawImage(gameOver, 0, 0);
+
+	document.addEventListener("click", resetGame);
 
 }
 
 
+function resetGame() {
+	game.reset();
+
+}
 
 
 
