@@ -145,6 +145,7 @@ function Movable(xPos,yPos,speed,type,img) {	//Type: 0 for medicine bag, 1 for m
 function Obstacle(xPos,yPos,offset,width,img) {	
 	this.x = xPos;
 	this.y = yPos;
+	this.xCoord = xPos * TILE_WIDTH;
 	this.xCoordAct = xPos * TILE_WIDTH + offset;
 	this.width = width;
 	var image = queue.getResult(img);
@@ -231,6 +232,13 @@ function Game(numMoved) {
 		character.yCoord = character.y*TILE_WIDTH;
 		createjs.Ticker.addEventListener("tick", handleTick);
 	}
+	this.sleep = function(miliseconds) {
+		var currentTime = new Date().getTime();
+	    while (currentTime + miliseconds >= new Date().getTime()) {
+	        
+	    }
+	    
+	}
 }
 
 
@@ -270,6 +278,7 @@ function setOffTicker() {
 function handleTick(event) {
      // Actions carried out each tick (aka frame)
     if (!event.paused) {
+    	
     	drawTileRow();
      	drawMovables();
      	drawObstacles();
@@ -294,7 +303,7 @@ function shiftTileRow() {
 	for(var i = 0; i<tileRows.length; i++) {
 		tileRows[i].shiftDown();	
 	}
-	console.log(tileRows);	
+
 
 	//game.numMoved++;	
 }
@@ -346,7 +355,7 @@ function shiftMovables() {
 	else {//if(tileRows[0].type === 2) {
 		addNewMovables(2, 0);
 	}
-	console.log(movables);
+
 	
 }
 function shiftObstacles() {
@@ -424,7 +433,7 @@ function addNewObstacles(row) {//Adds new row of obstacles
 function drawChar() {//Should be called constantly and check for collisions
 	var collided = movableCollision();
 	var fellOffEdge = isOutOfBounds();
-	
+	character.draw();
 	if(collided === 0) {
 		console.log("medicine bag collected");
 		game.numKits++;
@@ -459,7 +468,7 @@ function drawChar() {//Should be called constantly and check for collisions
 			gameOver();
 		}	
 	}
-	character.draw();
+	
 }
 
 function collides(x1, y1, w1, h1, x2, y2, w2, h2) {   //Some beautiful collision detection, box-style, copied from elsewhere
@@ -477,7 +486,6 @@ function movableCollision() { //return -1 for no collision, 0 for medicine bag c
     for (var i=0; i<movables.length; i++) {
         if (collides(character.xCoordAct, character.yCoord, character.width, TILE_WIDTH, movables[i].xCoord, movables[i].yCoord, TILE_WIDTH-1, TILE_WIDTH-1)) {//shrank tiles a bit to fix error
         	var type = movables[i].type;
-        	console.log(movables[i]);
         	if (type === 0) {
         		movables.splice(i, 1);
         		i--;
@@ -503,14 +511,17 @@ function waterCollision() { //returns true or false
 }
 function obstacleCollision(potX, potY) { //returns -1 for no collision, 0 for potential collision with obstacle, and 1 for collision with boundary
     for (var i=0; i<obstacles.length; i++) {
-        if (collides(potX, potY, character.width, TILE_WIDTH, obstacles[i].xCoordAct, obstacles[i].y * TILE_WIDTH, TILE_WIDTH-2, TILE_WIDTH-2)) 
-        	return 0;
+        if (collides(potX, potY, character.width, TILE_WIDTH, obstacles[i].xCoordAct, obstacles[i].y * TILE_WIDTH, obstacles[i].width, TILE_WIDTH-2)) 
+        	
+        	return obstacles[i].xCoordAct;//RETURNS THE COORDINATE OF THE OBSTACLE CHARACTER IS HEADED FOR
     }
-    if(potX < 0 || potX + character.width > TILE_WIDTH * GRID_WIDTH) 
+    if(potX < 0 || potX + character.width > TILE_WIDTH * GRID_WIDTH) {   	
         return 1;
-    
+    }
     return -1;
 }
+
+
 function isOutOfBounds() {
 	if(character.xCoordAct < 0 || character.xCoordAct + character.width > TILE_WIDTH * GRID_WIDTH) 
         return true;
@@ -533,9 +544,10 @@ function drawScores() {
 }
 
 function printKey(e){
+
 	if (e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) {
             e.preventDefault();
-        }
+    	}
         if (game.inProgress == true) {
             if (e.keyCode == 38 && obstacleCollision(character.xCoordAct,character.yCoord - TILE_WIDTH) === -1){ //-1 is no collision, 
             	//0 is obstacle collision, 1 is boundary collision
@@ -558,13 +570,15 @@ function printKey(e){
 					character.xCoord = 0;
 					character.xCoordAct = 14;
 				}
-				else if (potCollision === 0 && obstacleCollision(character.xCoordAct, character.yCoord) === -1) {//Snap to edge of obstac;e
-			console.log("snap to edge obstacle");  		
-					character.xCoord = Math.floor(character.xCoord / 50) * 50;
+				else if(potCollision === -1)//no collision
+                	character.left();
+
+				else {//if (potCollision === 0 ) {//Snap to edge of obstac;e
+			console.log("snap to edge obstacle on left");  		
+					character.xCoord = potCollision +TILE_WIDTH;
 					character.xCoordAct = character.xCoord + 14;
 				}
-                else if(potCollision === -1)//no collision
-                	character.left();
+                
 
 
             } 
@@ -578,29 +592,31 @@ function printKey(e){
 					character.xCoord = GRID_WIDTH*TILE_WIDTH - TILE_WIDTH;
 					character.xCoordAct = character.xCoord + 14;
 				}
-				else if (potCollision === 0 && obstacleCollision(character.xCoordAct, character.yCoord) === -1) {//Snap to edge of boundary
-		console.log("snap to edge obstacle");  			
-					character.xCoord = Math.ceil(character.xCoord / 50) * 50;
+				else if(potCollision === -1)//no potential collision
+                	character.right();
+				
+				else {//Snap to edge of boundary
+		console.log("snap to edge obstacle right potentialCollision = " + potCollision);  			
+					character.xCoord = potCollision -TILE_WIDTH;
 					character.xCoordAct = character.xCoord + 14;
 				}
-                else if(potCollision === -1)//no collision
-                	character.right();
+                
             } 
             character.draw();
         }
+        console.log("xCoord is " + character.xCoord + " xCoordAct is " + character.xCoordAct);
 	
 }	
+
 function gameOver() {
 	createjs.Ticker.off("tick", handleTick);
+	
 	game.inProgress = false;
-
+	game.sleep(2000);//Wait 2 seconds until gameOver page is shown
 	game.reset();
-
 	game.inProgress = true;
 
 }
-
-
 
 
 
