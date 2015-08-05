@@ -238,7 +238,7 @@ function Boat (x,y,speed) {
 
 //Medical Kit constructor
 function MedicalKit(x,y) {
-	var rand = Math.floor(Math.random(3)); //0, 1, or 2
+	var rand = Math.floor(Math.random()*3); //0, 1, or 2
 	var image;
 	if( rand === 0) {
 		image = "testImages/medical-kit.png";
@@ -610,11 +610,9 @@ function drawScores() {
     scoreContext.fillText("Score: ", 5, 30); 
     scoreContext.fillText(game.score, 77, 30);
 
-    scoreContext.fillText(game.numKits, 125, 50);  
-    if(game.numKits == 1)
-    	scoreContext.fillText("Medical Kit:", 5, 50);
-    else
-    	scoreContext.fillText("Medical Kits:", 5, 50);
+    scoreContext.fillText(game.numKits, 135, 50);    
+    scoreContext.fillText("Med Supplies:", 5, 50);
+   
 }
 
 function printKey(e){
