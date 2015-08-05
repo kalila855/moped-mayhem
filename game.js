@@ -476,9 +476,9 @@ function addNewMovables(type, row) {//Adds new row of movables
 		for(var xPos = rand; xPos<GRID_WIDTH; xPos+= rand) {
 			rand = 0;
 			if(type === 0) {//If ground type..
-				xPos+= Math.floor(Math.random()*5);
+				xPos+= Math.floor(Math.random()*5 );
 				movables.push(new MedicalKit(xPos, row, 0));
-				rand = Math.floor(Math.random()*5);//This is to decrease the frequency of medical kit spawns
+				rand = Math.floor(Math.random()*5+3);//This is to decrease the frequency of medical kit spawns
 			}
 			else if(type === 1) {//If road type..
 				movables.push(new Moped(xPos, row, speed));
@@ -490,17 +490,36 @@ function addNewMovables(type, row) {//Adds new row of movables
 		}
 	}	
 }
-function addNewObstacles(row) {//Adds new row of obstacles
+function addNewObstacles(row) {//Adds new row of obstacles TO DO: Make it so obstacles do not appear on medical supplies
 	var rand = Math.floor(Math.random()*7);//This returns 0, 1, 2, 3, 4, 5, 6 in equal proportions
 	for(var xPos = rand; xPos<GRID_WIDTH; xPos+= rand) {
-		if(rand % 3 === 0)
-			obstacles.push(new Tree(xPos, row));
-		else if(rand % 3 === 1)
-			obstacles.push(new Building(xPos, row));	
-		else
-			obstacles.push(new Temple(xPos, row));//Should be the least common..NOT
+
+		if(obstacleSpawnHelper(row, xPos) == true) {
+console.log("true at " + row + " " + xPos);
+			if(rand % 3 === 0)
+				obstacles.push(new Tree(xPos, row));
+			else if(rand % 3 === 1)
+				obstacles.push(new Building(xPos, row));	
+			else
+				obstacles.push(new Temple(xPos, row));//Should be the least common..NOT
+		}	
+		else{
+			console.log("false at " + row + " " + xPos);
+
+		}
 		rand = Math.floor(Math.random()*7) + 1;
 	}
+}
+
+function obstacleSpawnHelper(row, col) {//Returns true or false if the proposed obstacle will colllide with a movable.
+	for(var i = 0; i<movables.length; i++) {
+		if(movables[i].type === 0 && movables[i].x === col && movables[i].y === row) {
+		console.log("there is a medicla kit at " + col + " " + row);
+				return false;
+		
+		}	
+	}
+	return true;
 }
 function drawChar() {//Should be called constantly and check for collisions
 	var collided = movableCollision();
