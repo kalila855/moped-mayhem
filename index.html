@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+
+	<title> Moped Mayhem! </title>
+
+	<link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+
+	<style>
+		#header {
+		    /*background-color:red;*/
+		    color:white;
+		    text-align:center;
+		    padding:5px;
+		    background-color: rgba(0,0,0,0.5);
+
+		}
+
+		#section {
+		    width:55%;
+		    float:center;
+		    padding:10px;
+		    background: rgba(0, 0, 0, 0.5);
+		   	 	 
+		}
+
+		#footer {
+		    background-color:black;
+		    color:white;
+		    clear:both;
+		    text-align:center;	 
+		   	position: fixed;	
+		   	bottom: 0;
+		   	left:0;
+		   	right:0;
+		   	height: 30px;
+
+		}
+
+		body {
+			font-family: 'Roboto Slab', serif;
+			background-image: url("testImages/background.jpg");
+			background-size: 100%;
+			background-attachment: fixed;
+
+		}
+
+	</style>
+
+	<link rel="stylesheet" type="text/css" href="StyleWebPage.css">
+	<script src="https://code.createjs.com/easeljs-0.8.1.min.js"></script>
+
+	<script src="http://code.jquery.com/jquery-1.5.min.js"></script>
+	<script src="https://code.createjs.com/preloadjs-0.6.1.min.js"></script>
+	<script src="game.js" type="text/javascript"></script>
+
+	
+
+
+</head>
+
+
+<body onload = "loadImages();" onkeydown = "printKey(event)">
+
+	<div id="header">
+		<h1 style="margin-bottom:0;"><big>Moped Mayhem<img src="testImages/nurse-f.png"></big></h1>
+		<h2><big>Trouble in Cambodia</big></h2>
+
+	</div>
+
+
+
+
+	<center><h4>Game Instructions: Use arrow keys to move. To complete the game, collect 10 mediccal supplies and reach the hospital.</h4></center>
+	<center><h4>A Game with a Purpose: Scroll Down to Learn More</h4></center>
+
+
+  	<center><canvas id ="info" width="180" height="120"> </canvas></center>
+
+  	<center><canvas id="demoCanvas" width="500" height="550" class= "center"></canvas></center>
+
+<center><p><a href="http://www.sihosp.org/" target="_blank" class="buttonD">Donate</a></p></center>
+<div id="block">	
+<center>
+
+	<div id="section">
+
+			
+				<h3><big>Like our game? A little bit of background: Cambodia, a Southeastern Asian country, lacks accessible and affordable healthcare. Cambodia experienced a horrible genocide and communist tyranny from 1975 to 1979 that took the lives of about 1/4 of the population and almost all of the educated people. Cambodia is still struggling to recover from that tragedy; there are not enough professional doctors or hospitals.</big></h3>
+
+				<h3><big>One of our team members traveled to Cambodia this year on a medical missions trip. If you would like to learn more please click 'More Info' below.</big></h3>
+				<p id = M><a href="moreInfo.html" target="_blank" class="buttonI">More Info</a></p>
+			
+	
+		
+			<h3 width="200" class="D"><big>If you would like to donate today please click the button above, which will lead you to Sihanouk Hospital Center of HOPE, a nonprofit hospital which works to provide free and more accessible healthcare to the disadvantaged in Cambodia.</big></h3>
+
+		<!-- 	<p><a href="http://www.sihosp.org/" target="_blank" class="buttonD">Donate</a></p> -->
+		
+
+	</div>
+</center>
+</div>
+
+
+
+
+	<div id="footer">
+	Made by Stephanie, Michelle, and Kayleigh | Girls Who Code 2015
+	</div>
+
+
+
+
+</body>
+
+</html>
